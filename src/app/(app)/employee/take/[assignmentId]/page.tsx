@@ -16,6 +16,8 @@ export const metadata: Metadata = {
   title: "Assessment",
 };
 
+export const maxDuration = 60;
+
 export default async function TakeAssessmentPage({
   params,
 }: {

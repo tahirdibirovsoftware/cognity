@@ -21,6 +21,8 @@ export const metadata: Metadata = {
   title: "Policy documents",
 };
 
+export const maxDuration = 60;
+
 export default async function DocumentsPage() {
   await requireManager();
   const documents = await getDocumentsWithAssessments();

@@ -44,6 +44,8 @@ export const metadata: Metadata = {
   title: "Assessment review",
 };
 
+export const maxDuration = 60;
+
 export default async function AssessmentDetailPage({
   params,
   searchParams,
