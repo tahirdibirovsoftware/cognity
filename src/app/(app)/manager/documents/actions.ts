@@ -202,7 +202,7 @@ async function saveGeneratedQuestions(
 
 type GenerateResult =
   | { success: true; message: string; mode: "saved" }
-  | { assessmentId: string; failed: boolean; mode: "generated" }
+  | { assessmentId: string; failed: boolean; reason?: string; mode: "generated" }
   | { error: string };
 
 async function runGenerate(
@@ -318,8 +318,9 @@ async function runGenerate(
     await saveGeneratedQuestions(assessment.id, generated);
     return { assessmentId: assessment.id, failed: false, mode: "generated" };
   } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
     console.error("[generateAssessment] AI generation failed", error);
-    return { assessmentId: assessment.id, failed: true, mode: "generated" };
+    return { assessmentId: assessment.id, failed: true, reason, mode: "generated" };
   }
 }
 
@@ -351,15 +352,15 @@ export async function generateAssessmentAction(
     return { success: true, message: result.message };
   }
 
-  redirect(
-    result.failed
-      ? `/manager/assessments/${result.assessmentId}?generation=failed`
-      : `/manager/assessments/${result.assessmentId}`,
-  );
+  const querySuffix = result.failed
+    ? `?generation=failed${"reason" in result && result.reason ? `&reason=${encodeURIComponent(result.reason.slice(0, 200))}` : ""}`
+    : "";
+
+  redirect(`/manager/assessments/${result.assessmentId}${querySuffix}`);
 }
 
 export async function retryGenerationAction(formData: FormData) {
-  const manager = await requireManager();
+  await requireManager();
 
   const parsedId = z
     .uuid()
@@ -371,9 +372,10 @@ export async function retryGenerationAction(formData: FormData) {
     where: eq(assessments.id, parsedId.data),
     with: { document: true },
   });
-  if (!assessment || assessment.createdById !== manager.id) return;
+  if (!assessment) return;
 
   let failed = false;
+  let reason = "";
   try {
     const generated = await generateAssessment({
       title: assessment.document.title,
@@ -383,13 +385,14 @@ export async function retryGenerationAction(formData: FormData) {
   } catch (error) {
     console.error("[retryGeneration] AI generation failed", error);
     failed = true;
+    reason = error instanceof Error ? error.message : String(error);
   }
 
   revalidatePath(`/manager/assessments/${assessment.id}`);
   revalidatePath("/manager/documents");
   redirect(
     failed
-      ? `/manager/assessments/${assessment.id}?generation=failed`
+      ? `/manager/assessments/${assessment.id}?generation=failed${reason ? `&reason=${encodeURIComponent(reason.slice(0, 200))}` : ""}`
       : `/manager/assessments/${assessment.id}`,
   );
 }
@@ -418,6 +421,7 @@ export async function generateFromDocumentAction(formData: FormData) {
     .returning();
 
   let failed = false;
+  let reason = "";
   try {
     const generated = await generateAssessment({
       title: document.title,
@@ -427,13 +431,14 @@ export async function generateFromDocumentAction(formData: FormData) {
   } catch (error) {
     console.error("[generateFromDocument] AI generation failed", error);
     failed = true;
+    reason = error instanceof Error ? error.message : String(error);
   }
 
   revalidatePath("/manager/documents");
   revalidatePath("/manager");
   redirect(
     failed
-      ? `/manager/assessments/${assessment.id}?generation=failed`
+      ? `/manager/assessments/${assessment.id}?generation=failed${reason ? `&reason=${encodeURIComponent(reason.slice(0, 200))}` : ""}`
       : `/manager/assessments/${assessment.id}`,
   );
 }

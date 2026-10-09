@@ -52,7 +52,7 @@ export default async function AssessmentDetailPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ generation?: string }>;
+  searchParams: Promise<{ generation?: string; reason?: string }>;
 }) {
   await requireManager();
   const { id } = await params;
@@ -138,8 +138,9 @@ export default async function AssessmentDetailPage({
           <div>
             <p className="font-medium">AI generation failed.</p>
             <p className="mt-0.5 text-destructive/80">
-              The document was saved. Retry generation — DeepSeek occasionally
-              times out on long documents.
+              {query.reason
+                ? `${query.reason}. The document was saved — retry generation or paste a shorter excerpt.`
+                : "The document was saved. Retry generation — DeepSeek occasionally times out on long documents."}
             </p>
           </div>
         </div>
