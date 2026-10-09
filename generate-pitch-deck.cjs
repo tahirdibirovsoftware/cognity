@@ -26,9 +26,9 @@ async function generateDeck() {
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Cognity - Enterprise AI Compliance Pitch Deck</title>
+<title>Cognity - Enterprise AI Compliance Intelligence Pitch Deck</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
   * {
     box-sizing: border-box;
@@ -55,7 +55,7 @@ async function generateDeck() {
     height: 1080px;
     page-break-after: always;
     position: relative;
-    padding: 72px 96px;
+    padding: 68px 92px;
     background-color: #09090b;
     overflow: hidden;
     display: flex;
@@ -69,8 +69,8 @@ async function generateDeck() {
     position: absolute;
     inset: 0;
     background-image: 
-      linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
     background-size: 64px 64px;
     pointer-events: none;
     z-index: 0;
@@ -90,7 +90,7 @@ async function generateDeck() {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 32px;
+    margin-bottom: 28px;
   }
 
   .brand-logo {
@@ -103,14 +103,14 @@ async function generateDeck() {
     width: 32px;
     height: 32px;
     border-radius: 8px;
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
     display: flex;
     align-items: center;
     justify-content: center;
     color: #ffffff;
-    font-weight: 700;
+    font-weight: 800;
     font-size: 16px;
-    box-shadow: 0 0 20px rgba(37, 99, 235, 0.35);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
   }
 
   .brand-text {
@@ -147,8 +147,20 @@ async function generateDeck() {
     background-color: rgba(37, 99, 235, 0.08);
   }
 
+  .badge-purple {
+    color: #c084fc;
+    border-color: rgba(168, 85, 247, 0.3);
+    background-color: rgba(168, 85, 247, 0.08);
+  }
+
+  .badge-rose {
+    color: #fb7185;
+    border-color: rgba(244, 63, 94, 0.3);
+    background-color: rgba(244, 63, 94, 0.08);
+  }
+
   .slide-title-area {
-    margin-bottom: 28px;
+    margin-bottom: 24px;
   }
 
   .category-pill {
@@ -163,7 +175,7 @@ async function generateDeck() {
   }
 
   .slide-title {
-    font-size: 44px;
+    font-size: 42px;
     font-weight: 800;
     letter-spacing: -0.035em;
     color: #ffffff;
@@ -171,11 +183,11 @@ async function generateDeck() {
   }
 
   .slide-subtitle {
-    font-size: 18px;
+    font-size: 17px;
     color: #a1a1aa;
-    margin-top: 10px;
+    margin-top: 8px;
     line-height: 1.5;
-    max-width: 900px;
+    max-width: 980px;
   }
 
   /* shadcn-style cards */
@@ -183,16 +195,16 @@ async function generateDeck() {
     background-color: rgba(18, 18, 22, 0.85);
     border: 1px solid #27272a;
     border-radius: 16px;
-    padding: 32px;
+    padding: 28px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
   }
 
   .card-header {
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
 
   .card-title {
-    font-size: 20px;
+    font-size: 19px;
     font-weight: 700;
     letter-spacing: -0.02em;
     color: #f4f4f5;
@@ -201,42 +213,43 @@ async function generateDeck() {
   .card-desc {
     font-size: 14px;
     color: #a1a1aa;
-    margin-top: 6px;
-    line-height: 1.5;
+    line-height: 1.55;
+    margin-top: 8px;
   }
 
-  /* Window mockup container */
+  /* Window / browser mockup */
   .mockup-window {
-    border-radius: 14px;
-    border: 1px solid #27272a;
     background-color: #121216;
+    border: 1px solid #27272a;
+    border-radius: 14px;
     overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-    display: flex;
-    flex-direction: column;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
   }
 
   .mockup-header {
-    height: 36px;
-    background-color: #18181b;
-    border-bottom: 1px solid #27272a;
     display: flex;
     align-items: center;
-    padding: 0 16px;
-    gap: 8px;
+    padding: 10px 16px;
+    background-color: #18181b;
+    border-bottom: 1px solid #27272a;
   }
 
-  .dot {
+  .mockup-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .mockup-dot {
     width: 10px;
     height: 10px;
     border-radius: 50%;
   }
 
-  .dot-red { background-color: #ef4444; opacity: 0.8; }
-  .dot-yellow { background-color: #eab308; opacity: 0.8; }
-  .dot-green { background-color: #22c55e; opacity: 0.8; }
+  .dot-red { background-color: #ef4444; }
+  .dot-yellow { background-color: #eab308; }
+  .dot-green { background-color: #22c55e; }
 
-  .mockup-url {
+  .mockup-title {
     margin-left: 12px;
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
@@ -265,13 +278,13 @@ async function generateDeck() {
   .grid-3 {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 28px;
+    gap: 24px;
   }
 
   .grid-4 {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
+    gap: 20px;
   }
 
   /* Metric callouts */
@@ -279,11 +292,11 @@ async function generateDeck() {
     background-color: rgba(24, 24, 27, 0.5);
     border: 1px solid #27272a;
     border-radius: 14px;
-    padding: 24px;
+    padding: 22px;
   }
 
   .metric-value {
-    font-size: 42px;
+    font-size: 38px;
     font-weight: 800;
     letter-spacing: -0.04em;
     color: #ffffff;
@@ -292,10 +305,10 @@ async function generateDeck() {
   }
 
   .metric-label {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     color: #f4f4f5;
-    margin-top: 8px;
+    margin-top: 6px;
   }
 
   .metric-sub {
@@ -310,7 +323,7 @@ async function generateDeck() {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
     margin-top: 16px;
   }
 
@@ -318,7 +331,7 @@ async function generateDeck() {
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    font-size: 15px;
+    font-size: 14px;
     color: #d4d4d8;
     line-height: 1.5;
   }
@@ -332,14 +345,49 @@ async function generateDeck() {
     flex-shrink: 0;
   }
 
+  /* Table styling */
+  .matrix-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
+  }
+
+  .matrix-table th {
+    padding: 12px 16px;
+    background-color: rgba(24, 24, 27, 0.8);
+    color: #a1a1aa;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid #27272a;
+  }
+
+  .matrix-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(39, 39, 42, 0.5);
+    color: #d4d4d8;
+  }
+
+  .matrix-table tr:hover {
+    background-color: rgba(39, 39, 42, 0.2);
+  }
+
+  .matrix-highlight {
+    color: #38bdf8 !important;
+    font-weight: 600;
+  }
+
   /* Slide footer */
   .slide-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-top: 1px solid rgba(39, 39, 42, 0.6);
-    padding-top: 20px;
-    margin-top: 24px;
+    padding-top: 18px;
+    margin-top: 20px;
   }
 
   .footer-meta {
@@ -361,42 +409,41 @@ async function generateDeck() {
 <!-- SLIDE 1: COVER -->
 <section class="slide" style="justify-content: center; align-items: center; text-align: center;">
   <div class="slide-content" style="justify-content: center; align-items: center; width: 100%;">
-    <div style="margin-bottom: 32px;">
-      <span class="badge badge-blue">
-        Enterprise Compliance Intelligence
-      </span>
+    <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center;">
+      <span class="badge badge-blue">OMNI AI SUMMIT 2026 · AI ENTERPRISE SOLUTIONS TRACK</span>
+      <span class="badge badge-emerald">TEAM: THE MONAD</span>
     </div>
 
     <div style="display: flex; align-items: center; justify-content: center; gap: 18px; margin-bottom: 24px;">
-      <div class="brand-mark" style="width: 56px; height: 56px; font-size: 26px; border-radius: 14px;">C</div>
-      <h1 style="font-size: 80px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff;">Cognity</h1>
+      <div class="brand-mark" style="width: 58px; height: 58px; font-size: 28px; border-radius: 14px;">C</div>
+      <h1 style="font-size: 82px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff;">Cognity</h1>
     </div>
 
-    <p style="font-size: 28px; font-weight: 400; color: #e4e4e7; max-width: 960px; line-height: 1.4; margin-bottom: 40px; letter-spacing: -0.02em;">
+    <p style="font-size: 26px; font-weight: 400; color: #e4e4e7; max-width: 980px; line-height: 1.4; margin-bottom: 38px; letter-spacing: -0.02em;">
       Turn enterprise policies into auditable workforce compliance assessments in minutes.
     </p>
 
-    <div style="display: flex; gap: 16px; justify-content: center; margin-bottom: 56px;">
+    <div style="display: flex; gap: 16px; justify-content: center; margin-bottom: 52px;">
       <div class="badge" style="padding: 10px 20px; font-size: 13px;">
         Grounded in Ground Truth Documents
       </div>
       <div class="badge badge-emerald" style="padding: 10px 20px; font-size: 13px;">
         100% Auditor Defensible
       </div>
-      <div class="badge" style="padding: 10px 20px; font-size: 13px;">
-        DeepSeek Reasoning Engine
+      <div class="badge badge-blue" style="padding: 10px 20px; font-size: 13px;">
+        DeepSeek Reasoner Engine
       </div>
     </div>
 
-    <div style="display: flex; justify-content: space-between; width: 100%; max-width: 800px; border-top: 1px solid #27272a; padding-top: 24px;">
+    <div style="display: flex; justify-content: space-between; width: 100%; max-width: 860px; border-top: 1px solid #27272a; padding-top: 24px;">
       <span class="footer-meta">Product Overview & Pitch Deck</span>
       <span class="footer-meta">SOC 2 · GDPR · ISO 27001 · HIPAA</span>
-      <span class="footer-meta">Q4 2026 Edition</span>
+      <span class="footer-meta">Live on Stage · Day Two</span>
     </div>
   </div>
 </section>
 
-<!-- SLIDE 2: THE PROBLEM -->
+<!-- SLIDE 2: VALUE FOR THE USER - PROBLEM DEFINITION (25 PTS) -->
 <section class="slide">
   <div class="slide-content">
     <div class="slide-header">
@@ -404,57 +451,67 @@ async function generateDeck() {
         <div class="brand-mark">C</div>
         <span class="brand-text">Cognity</span>
       </div>
-      <span class="badge">The Problem</span>
+      <span class="badge badge-blue">Judge Scoring: Value for the User (25 Pts)</span>
     </div>
 
     <div class="slide-title-area">
-      <span class="category-pill">Market Friction</span>
+      <span class="category-pill">THE SPECIFIC PROBLEM</span>
       <h2 class="slide-title">The Enterprise Compliance Bottleneck</h2>
       <p class="slide-subtitle">
-        Every quarter, compliance, HR, and security teams face regulatory mandates to test employees on evolving policies. Today's workflow is broken.
+        Every quarter, compliance, HR, and security teams face regulatory mandates to test employees on evolving policies. Today's workflow is broken, expensive, and unprovable.
       </p>
+    </div>
+
+    <div class="card" style="padding: 18px 24px; margin-bottom: 20px; background-color: rgba(37, 99, 235, 0.06); border-color: rgba(37, 99, 235, 0.3);">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <span style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #60a5fa; text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 2px;">Target User Persona</span>
+          <span style="font-size: 14px; font-weight: 600; color: #ffffff;">CISOs, Compliance Officers & People Ops Leads at Regulated Enterprises (Fintech, Healthtech, SOC 2 / ISO 27001 SaaS)</span>
+        </div>
+        <span class="badge badge-blue" style="font-size: 11px;">Clear Scope — No Generic "Everyone"</span>
+      </div>
     </div>
 
     <div class="grid-3">
       <div class="card">
-        <div class="badge" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3); background-color: rgba(239, 68, 68, 0.08); margin-bottom: 16px;">
-          Pain Point 01
+        <div class="badge" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3); background-color: rgba(239, 68, 68, 0.08); margin-bottom: 14px;">
+          Friction 01
         </div>
         <h3 class="card-title">Superficial LMS Checkboxes</h3>
         <p class="card-desc">
-          Legacy platforms rely on generic multiple-choice questions that employees guess through without reading the actual company policies. No actual risk mitigation occurs.
+          Legacy platforms rely on generic multiple-choice questions that employees guess through without reading the company policies. Zero actual risk mitigation against real security breaches.
         </p>
       </div>
 
       <div class="card">
-        <div class="badge" style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.3); background-color: rgba(245, 158, 11, 0.08); margin-bottom: 16px;">
-          Pain Point 02
+        <div class="badge" style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.3); background-color: rgba(245, 158, 11, 0.08); margin-bottom: 14px;">
+          Friction 02
         </div>
         <h3 class="card-title">Manual Authoring Exhaustion</h3>
         <p class="card-desc">
-          Drafting policy quizzes, formulating grading rubrics, and writing rationale takes 20+ hours of legal and HR team time whenever a policy is updated or an audit nears.
+          Drafting policy quizzes, formulating grading rubrics, and writing model answers takes 20+ hours of legal and security team time whenever a policy is revised or an audit nears.
         </p>
       </div>
 
       <div class="card">
-        <div class="badge" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3); background-color: rgba(239, 68, 68, 0.08); margin-bottom: 16px;">
-          Pain Point 03
+        <div class="badge" style="color: #a855f7; border-color: rgba(168, 85, 247, 0.3); background-color: rgba(168, 85, 247, 0.08); margin-bottom: 14px;">
+          Friction 03
         </div>
         <h3 class="card-title">Zero Audit Defensibility</h3>
         <p class="card-desc">
-          External auditors demand evidence that employees actually comprehend data protection controls. Completion timestamps no longer satisfy modern SOC 2 or ISO 27001 auditors.
+          External auditors demand evidence that employees comprehend controls. Completion timestamps do not satisfy SOC 2 auditors, yet manually grading open-ended answers takes 15 mins/employee.
         </p>
       </div>
     </div>
 
     <div class="slide-footer">
       <span class="footer-meta">Cognity · Problem Definition</span>
-      <span class="footer-page">02 / 12</span>
+      <span class="footer-page">02 / 14</span>
     </div>
   </div>
 </section>
 
-<!-- SLIDE 3: THE SOLUTION -->
+<!-- SLIDE 3: VALUE OUTCOME - BEFORE VS AFTER -->
 <section class="slide">
   <div class="slide-content">
     <div class="slide-header">
@@ -462,12 +519,12 @@ async function generateDeck() {
         <div class="brand-mark">C</div>
         <span class="brand-text">Cognity</span>
       </div>
-      <span class="badge badge-emerald">The Solution</span>
+      <span class="badge badge-emerald">Clear Outcomes & Metrics</span>
     </div>
 
     <div class="slide-title-area">
-      <span class="category-pill">Our Value Proposition</span>
-      <h2 class="slide-title">End-to-End AI Compliance Platform</h2>
+      <span class="category-pill">CLEAR OUTCOME</span>
+      <h2 class="slide-title">Measurable Transformation: Before vs After</h2>
       <p class="slide-subtitle">
         Cognity automates the full policy-to-mastery lifecycle: from raw PDF documents to tailored question rubrics, employee testing, and auditor-ready audit logs.
       </p>
@@ -477,48 +534,144 @@ async function generateDeck() {
       <div class="metric-box">
         <div class="metric-value" style="color: #3b82f6;">11.4h</div>
         <div class="metric-label">Time Saved per Cycle</div>
-        <div class="metric-sub">Eliminates manual question drafting and grading.</div>
+        <div class="metric-sub">Eliminates 98% of manual question drafting & grading time.</div>
       </div>
+
       <div class="metric-box">
         <div class="metric-value" style="color: #10b981;">94%</div>
         <div class="metric-label">First-Cycle Mastery</div>
-        <div class="metric-sub">Deep comprehension driven by scenario questions.</div>
+        <div class="metric-sub">Deep comprehension driven by scenario-based questions.</div>
       </div>
+
       <div class="metric-box">
-        <div class="metric-value" style="color: #a855f7;">50 MB</div>
-        <div class="metric-label">Direct Document Ingestion</div>
-        <div class="metric-sub">Stores policies in secure S3 object storage.</div>
+        <div class="metric-value" style="color: #8b5cf6;">50 MB</div>
+        <div class="metric-label">Direct PDF Ingestion</div>
+        <div class="metric-sub">Stores multi-chapter manuals in secure S3 object storage.</div>
       </div>
+
       <div class="metric-box">
-        <div class="metric-value" style="color: #f59e0b;">100%</div>
+        <div class="metric-value" style="color: #ec4899;">100%</div>
         <div class="metric-label">Auditor Traceability</div>
-        <div class="metric-sub">Every grade accompanied by exact policy citations.</div>
+        <div class="metric-sub">Every grade accompanied by exact policy clause citations.</div>
       </div>
     </div>
 
-    <div class="grid-2">
-      <div class="card" style="padding: 24px 28px;">
-        <h4 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Automated Rubric Synthesis</h4>
+    <div class="grid-2" style="gap: 24px;">
+      <div class="card" style="padding: 22px; border-left: 4px solid #ef4444;">
+        <span class="badge" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3); background-color: rgba(239, 68, 68, 0.08); margin-bottom: 8px;">Before Cognity (Broken LMS)</span>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #a1a1aa;">
+          <li>· 20+ hours wasted drafting questions and answer keys.</li>
+          <li>· Multiple choice guessing with zero critical thinking.</li>
+          <li>· Manual grading backlog: 15 minutes per written answer.</li>
+          <li>· Failed audit reviews: completion certificates rejected as proof.</li>
+        </ul>
+      </div>
+
+      <div class="card" style="padding: 22px; border-left: 4px solid #10b981;">
+        <span class="badge badge-emerald" style="margin-bottom: 8px;">After Cognity (AI Intelligence)</span>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #a1a1aa;">
+          <li>· <strong style="color: #fff;">30-second automated synthesis</strong> from uploaded 50MB PDFs.</li>
+          <li>· Real workplace scenarios testing actionable judgment.</li>
+          <li>· <strong style="color: #fff;">&lt;3 second hybrid grading</strong> of open-ended written responses.</li>
+          <li>· 100% defensible audit trail with exact policy citations.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <span class="footer-meta">Cognity · Solution & Outcomes</span>
+      <span class="footer-page">03 / 14</span>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 4: PROTOTYPE & WHAT AI ACTUALLY CONTRIBUTES (30 PTS) -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="slide-header">
+      <div class="brand-logo">
+        <div class="brand-mark">C</div>
+        <span class="brand-text">Cognity</span>
+      </div>
+      <span class="badge badge-blue">Judge Scoring: Prototype & Use of AI (30 Pts)</span>
+    </div>
+
+    <div class="slide-title-area">
+      <span class="category-pill">AI CONTRIBUTION DEEP DIVE</span>
+      <h2 class="slide-title">What AI Actually Contributes vs Traditional Code</h2>
+      <p class="slide-subtitle">
+        Cognity does not use shallow prompt wrappers. AI is used for deep legal policy reasoning, schema-constrained rubric compilation, and semantic evaluation.
+      </p>
+    </div>
+
+    <div class="card" style="padding: 24px; margin-bottom: 24px; background: rgba(18, 18, 22, 0.9);">
+      <div style="font-size: 12px; font-family: 'JetBrains Mono', monospace; color: #60a5fa; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 14px;">
+        Core AI Data Flow Pipeline
+      </div>
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+        <div style="background-color: #18181b; border: 1px solid #27272a; border-radius: 10px; padding: 14px; text-align: center; flex: 1;">
+          <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #71717a;">STEP 01</div>
+          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 4px;">PDF Chunking</div>
+          <div style="font-size: 11px; color: #a1a1aa; margin-top: 4px;">Deterministic Parser</div>
+        </div>
+        <div style="color: #3b82f6; font-size: 18px; font-weight: 700;">→</div>
+        <div style="background-color: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.4); border-radius: 10px; padding: 14px; text-align: center; flex: 1.2;">
+          <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #60a5fa;">STEP 02 (AI)</div>
+          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 4px;">Obligation Extraction</div>
+          <div style="font-size: 11px; color: #93c5fd; margin-top: 4px;">DeepSeek Reasoner</div>
+        </div>
+        <div style="color: #3b82f6; font-size: 18px; font-weight: 700;">→</div>
+        <div style="background-color: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 10px; padding: 14px; text-align: center; flex: 1.2;">
+          <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #c084fc;">STEP 03 (AI)</div>
+          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 4px;">Rubric Synthesis</div>
+          <div style="font-size: 11px; color: #d8b4fe; margin-top: 4px;">JSON Schema Constrained</div>
+        </div>
+        <div style="color: #3b82f6; font-size: 18px; font-weight: 700;">→</div>
+        <div style="background-color: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 10px; padding: 14px; text-align: center; flex: 1.2;">
+          <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #34d399;">STEP 04 (AI)</div>
+          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 4px;">Semantic Grading</div>
+          <div style="font-size: 11px; color: #6ee7b7; margin-top: 4px;">&lt;3s Hybrid Evaluator</div>
+        </div>
+        <div style="color: #3b82f6; font-size: 18px; font-weight: 700;">→</div>
+        <div style="background-color: #18181b; border: 1px solid #27272a; border-radius: 10px; padding: 14px; text-align: center; flex: 1;">
+          <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #71717a;">STEP 05</div>
+          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 4px;">Audit Trail</div>
+          <div style="font-size: 11px; color: #a1a1aa; margin-top: 4px;">Neon Postgres DB</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <h4 style="font-size: 16px; font-weight: 700; color: #60a5fa; margin-bottom: 8px;">1. Obligation Extraction</h4>
         <p style="font-size: 13px; color: #a1a1aa; line-height: 1.5;">
-          Our DeepSeek AI pipeline reads company documents, identifies testable regulatory obligations, and crafts questions with strict scoring criteria.
+          Traditional regex fails on dense legal prose. AI identifies testable security mandates, regulatory requirements, and high-risk operational obligations from raw policy text.
         </p>
       </div>
-      <div class="card" style="padding: 24px 28px;">
-        <h4 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Hybrid Real-Time Grading</h4>
+
+      <div class="card">
+        <h4 style="font-size: 16px; font-weight: 700; color: #c084fc; margin-bottom: 8px;">2. Multi-Criteria Rubrics</h4>
         <p style="font-size: 13px; color: #a1a1aa; line-height: 1.5;">
-          Multiple choice checks immediately. Free-form written answers are evaluated by AI against the ground-truth rubric in seconds, providing instant guidance.
+          AI drafts full grading rubrics containing: point allocation, required conceptual keywords, penalty rules, model answers, and precise policy document citations before testing begins.
+        </p>
+      </div>
+
+      <div class="card">
+        <h4 style="font-size: 16px; font-weight: 700; color: #34d399; margin-bottom: 8px;">3. Open-Ended Semantic Grading</h4>
+        <p style="font-size: 13px; color: #a1a1aa; line-height: 1.5;">
+          Evaluates free-form written employee scenario answers against ground-truth rubrics in &lt;3 seconds. Grants partial credit, detects misconceptions, and explains point deductions.
         </p>
       </div>
     </div>
 
     <div class="slide-footer">
-      <span class="footer-meta">Cognity · Solution Architecture</span>
-      <span class="footer-page">03 / 12</span>
+      <span class="footer-meta">Cognity · AI Pipeline Architecture</span>
+      <span class="footer-page">04 / 14</span>
     </div>
   </div>
 </section>
 
-<!-- SLIDE 4: PRODUCT TOUR - INGESTION & GENERATION -->
+<!-- SLIDE 5: PRODUCT TOUR 01 - INGESTION -->
 <section class="slide">
   <div class="slide-content">
     <div class="slide-header">
@@ -529,33 +682,31 @@ async function generateDeck() {
       <span class="badge">Product Tour · Ingestion</span>
     </div>
 
-    <div class="grid-2" style="align-items: flex-start; height: 100%;">
+    <div class="grid-2">
       <div>
-        <div class="slide-title-area">
-          <span class="category-pill">Document Management</span>
-          <h2 class="slide-title" style="font-size: 38px;">From PDF to Assessment in 30 Seconds</h2>
-          <p class="slide-subtitle" style="font-size: 16px;">
-            Managers simply upload existing policy manuals or paste raw text. Cognity securely stores the original document and synthesizes a tailored compliance quiz.
-          </p>
-        </div>
+        <span class="category-pill">DOCUMENT MANAGEMENT</span>
+        <h2 class="slide-title">From PDF to Assessment in 30 Seconds</h2>
+        <p class="slide-subtitle">
+          Managers simply upload existing policy manuals or paste raw text. Cognity securely stores the original document and synthesizes a tailored compliance quiz.
+        </p>
 
-        <ul class="feature-list" style="margin-top: 24px;">
+        <ul class="feature-list">
           <li class="feature-item">
-            <span class="feature-bullet"></span>
+            <div class="feature-bullet"></div>
             <div>
-              <strong style="color: #ffffff;">50 MB Object Storage:</strong> High-capacity PDF parsing and secure cloud storage with pre-signed retrieval URLs.
+              <strong style="color: #fff;">50 MB Object Storage:</strong> High-capacity PDF parsing and secure cloud storage with pre-signed retrieval URLs.
             </div>
           </li>
           <li class="feature-item">
-            <span class="feature-bullet"></span>
+            <div class="feature-bullet"></div>
             <div>
-              <strong style="color: #ffffff;">Zero Prompt Engineering:</strong> System automatically discovers policy obligations and generates balanced multiple-choice, true/false, and written scenarios.
+              <strong style="color: #fff;">Zero Prompt Engineering:</strong> System automatically discovers policy obligations and generates balanced multiple-choice, true/false, and written scenarios.
             </div>
           </li>
           <li class="feature-item">
-            <span class="feature-bullet"></span>
+            <div class="feature-bullet"></div>
             <div>
-              <strong style="color: #ffffff;">Ground Truth Integrity:</strong> Strict boundary prompts guarantee questions never hallucinate details outside the source policy document.
+              <strong style="color: #fff;">Ground Truth Integrity:</strong> Strict boundary prompts guarantee questions never hallucinate details outside the source policy document.
             </div>
           </li>
         </ul>
@@ -563,25 +714,27 @@ async function generateDeck() {
 
       <div class="mockup-window">
         <div class="mockup-header">
-          <span class="dot dot-red"></span>
-          <span class="dot dot-yellow"></span>
-          <span class="dot dot-green"></span>
-          <span class="mockup-url">cognity.app/manager/documents</span>
+          <div class="mockup-dots">
+            <div class="mockup-dot dot-red"></div>
+            <div class="mockup-dot dot-yellow"></div>
+            <div class="mockup-dot dot-green"></div>
+          </div>
+          <span class="mockup-title">cognity.app/manager/documents</span>
         </div>
         <div class="mockup-body">
-          <img src="${imgDocs}" alt="Document Management and Generation Screen">
+          <img src="${imgDocs}" alt="Document Management UI">
         </div>
       </div>
     </div>
 
     <div class="slide-footer">
       <span class="footer-meta">Cognity · Feature Tour 01</span>
-      <span class="footer-page">04 / 12</span>
+      <span class="footer-page">05 / 14</span>
     </div>
   </div>
 </section>
 
-<!-- SLIDE 5: PRODUCT TOUR - QUESTION REVIEW & AUDITABLE RUBRICS -->
+<!-- SLIDE 6: PRODUCT TOUR 02 - QUESTIONS & RUBRICS -->
 <section class="slide">
   <div class="slide-content">
     <div class="slide-header">
@@ -589,48 +742,48 @@ async function generateDeck() {
         <div class="brand-mark">C</div>
         <span class="brand-text">Cognity</span>
       </div>
-      <span class="badge badge-blue">Product Tour · Questions</span>
+      <span class="badge">Product Tour · Questions</span>
     </div>
 
-    <div class="grid-2" style="align-items: flex-start; height: 100%;">
+    <div class="grid-2">
       <div class="mockup-window">
         <div class="mockup-header">
-          <span class="dot dot-red"></span>
-          <span class="dot dot-yellow"></span>
-          <span class="dot dot-green"></span>
-          <span class="mockup-url">cognity.app/manager/assessments</span>
+          <div class="mockup-dots">
+            <div class="mockup-dot dot-red"></div>
+            <div class="mockup-dot dot-yellow"></div>
+            <div class="mockup-dot dot-green"></div>
+          </div>
+          <span class="mockup-title">cognity.app/manager/assessments</span>
         </div>
         <div class="mockup-body">
-          <img src="${imgReview}" alt="Assessment Question and Rubric Review">
+          <img src="${imgReview}" alt="Assessment Review UI">
         </div>
       </div>
 
       <div>
-        <div class="slide-title-area">
-          <span class="category-pill">Auditable Intelligence</span>
-          <h2 class="slide-title" style="font-size: 38px;">Granular Rubrics & AI Rationale</h2>
-          <p class="slide-subtitle" style="font-size: 16px;">
-            Every generated question includes a multi-paragraph model answer, grading rubric, and precise regulatory rationale.
-          </p>
-        </div>
+        <span class="category-pill">AUDITABLE INTELLIGENCE</span>
+        <h2 class="slide-title">Granular Rubrics & AI Rationale</h2>
+        <p class="slide-subtitle">
+          Every generated question includes a multi-paragraph model answer, grading rubric, and precise regulatory rationale.
+        </p>
 
-        <ul class="feature-list" style="margin-top: 24px;">
+        <ul class="feature-list">
           <li class="feature-item">
-            <span class="feature-bullet"></span>
+            <div class="feature-bullet"></div>
             <div>
-              <strong style="color: #ffffff;">Auditor Defensible Rubrics:</strong> For every written question, AI drafts explicit point deduction rules and minimum required elements.
+              <strong style="color: #fff;">Auditor Defensible Rubrics:</strong> For every written question, AI drafts explicit point deduction rules and minimum required elements.
             </div>
           </li>
           <li class="feature-item">
-            <span class="feature-bullet"></span>
+            <div class="feature-bullet"></div>
             <div>
-              <strong style="color: #ffffff;">Manager Approval Workflow:</strong> Review, tune passing scores (e.g. 70%), and publish with 1 click to the entire company.
+              <strong style="color: #fff;">Manager Approval Workflow:</strong> Review, tune passing scores (e.g. 70%), and publish with 1 click to the entire company.
             </div>
           </li>
           <li class="feature-item">
-            <span class="feature-bullet"></span>
+            <div class="feature-bullet"></div>
             <div>
-              <strong style="color: #ffffff;">Multi-Format Testing:</strong> Combines fast-retrieval objective questions with deep real-world behavioral scenario evaluations.
+              <strong style="color: #fff;">Multi-Format Testing:</strong> Combines fast-retrieval objective questions with deep real-world behavioral scenario evaluations.
             </div>
           </li>
         </ul>
@@ -639,12 +792,12 @@ async function generateDeck() {
 
     <div class="slide-footer">
       <span class="footer-meta">Cognity · Feature Tour 02</span>
-      <span class="footer-page">05 / 12</span>
+      <span class="footer-page">06 / 14</span>
     </div>
   </div>
 </section>
 
-<!-- SLIDE 6: PRODUCT TOUR - EMPLOYEE MANAGEMENT & ONBOARDING -->
+<!-- SLIDE 7: PRODUCT TOUR 03 - WORKFORCE DIRECTORY -->
 <section class="slide">
   <div class="slide-content">
     <div class="slide-header">
@@ -655,33 +808,31 @@ async function generateDeck() {
       <span class="badge">Product Tour · Team</span>
     </div>
 
-    <div class="grid-2" style="align-items: flex-start; height: 100%;">
+    <div class="grid-2">
       <div>
-        <div class="slide-title-area">
-          <span class="category-pill">Workforce Governance</span>
-          <h2 class="slide-title" style="font-size: 38px;">Frictionless Team Onboarding & Assignment</h2>
-          <p class="slide-subtitle" style="font-size: 16px;">
-            A centralized directory to manage departments, assign specific training with deadlines, and oversee workforce readiness in real time.
-          </p>
-        </div>
+        <span class="category-pill">WORKFORCE GOVERNANCE</span>
+        <h2 class="slide-title">Frictionless Team Onboarding & Assignment</h2>
+        <p class="slide-subtitle">
+          A centralized directory to manage departments, assign specific training with deadlines, and oversee workforce readiness in real time.
+        </p>
 
-        <ul class="feature-list" style="margin-top: 24px;">
+        <ul class="feature-list">
           <li class="feature-item">
-            <span class="feature-bullet"></span>
+            <div class="feature-bullet"></div>
             <div>
-              <strong style="color: #ffffff;">1-Click Provisioning:</strong> Add team members and optionally assign their initial compliance training in a single dialog.
+              <strong style="color: #fff;">1-Click Provisioning:</strong> Add team members and optionally assign their initial compliance training in a single dialog.
             </div>
           </li>
           <li class="feature-item">
-            <span class="feature-bullet"></span>
+            <div class="feature-bullet"></div>
             <div>
-              <strong style="color: #ffffff;">Self-Serve Credential Copy:</strong> Built-in one-click clipboard copying and instant password reset directly from each employee row.
+              <strong style="color: #fff;">Self-Serve Credential Copy:</strong> Built-in one-click clipboard copying and instant password reset directly from each employee row.
             </div>
           </li>
           <li class="feature-item">
-            <span class="feature-bullet"></span>
+            <div class="feature-bullet"></div>
             <div>
-              <strong style="color: #ffffff;">Departmental Filtering:</strong> Sort by Engineering, Operations, Customer Success, or role to monitor completion rates.
+              <strong style="color: #fff;">Departmental Filtering:</strong> Sort by Engineering, Operations, Customer Success, or role to monitor completion rates.
             </div>
           </li>
         </ul>
@@ -689,25 +840,27 @@ async function generateDeck() {
 
       <div class="mockup-window">
         <div class="mockup-header">
-          <span class="dot dot-red"></span>
-          <span class="dot dot-yellow"></span>
-          <span class="dot dot-green"></span>
-          <span class="mockup-url">cognity.app/manager/employees</span>
+          <div class="mockup-dots">
+            <div class="mockup-dot dot-red"></div>
+            <div class="mockup-dot dot-yellow"></div>
+            <div class="mockup-dot dot-green"></div>
+          </div>
+          <span class="mockup-title">cognity.app/manager/employees</span>
         </div>
         <div class="mockup-body">
-          <img src="${imgEmployees}" alt="Employee Management Directory">
+          <img src="${imgEmployees}" alt="Employee Directory UI">
         </div>
       </div>
     </div>
 
     <div class="slide-footer">
       <span class="footer-meta">Cognity · Feature Tour 03</span>
-      <span class="footer-page">06 / 12</span>
+      <span class="footer-page">07 / 14</span>
     </div>
   </div>
 </section>
 
-<!-- SLIDE 7: PRODUCT TOUR - THE EMPLOYEE ASSESSMENT EXPERIENCE -->
+<!-- SLIDE 8: PRODUCT TOUR 04 - LEARNER INTERFACE -->
 <section class="slide">
   <div class="slide-content">
     <div class="slide-header">
@@ -715,48 +868,48 @@ async function generateDeck() {
         <div class="brand-mark">C</div>
         <span class="brand-text">Cognity</span>
       </div>
-      <span class="badge badge-emerald">Product Tour · Learner</span>
+      <span class="badge">Product Tour · Learner</span>
     </div>
 
-    <div class="grid-2" style="align-items: flex-start; height: 100%;">
+    <div class="grid-2">
       <div class="mockup-window">
         <div class="mockup-header">
-          <span class="dot dot-red"></span>
-          <span class="dot dot-yellow"></span>
-          <span class="dot dot-green"></span>
-          <span class="mockup-url">cognity.app/employee/take/534431...</span>
+          <div class="mockup-dots">
+            <div class="mockup-dot dot-red"></div>
+            <div class="mockup-dot dot-yellow"></div>
+            <div class="mockup-dot dot-green"></div>
+          </div>
+          <span class="mockup-title">cognity.app/employee/take/534431...</span>
         </div>
         <div class="mockup-body">
-          <img src="${imgTake}" alt="Employee Taking Assessment">
+          <img src="${imgTake}" alt="Learner Assessment UI">
         </div>
       </div>
 
       <div>
-        <div class="slide-title-area">
-          <span class="category-pill">Employee Experience</span>
-          <h2 class="slide-title" style="font-size: 38px;">Focused, Stress-Free Assessment Interface</h2>
-          <p class="slide-subtitle" style="font-size: 16px;">
-            Employees receive a clean, distraction-free environment that respects their time and encourages active engagement with company policies.
-          </p>
-        </div>
+        <span class="category-pill">EMPLOYEE EXPERIENCE</span>
+        <h2 class="slide-title">Focused, Stress-Free Assessment Interface</h2>
+        <p class="slide-subtitle">
+          Employees receive a clean, distraction-free environment that respects their time and encourages active engagement with company policies.
+        </p>
 
-        <ul class="feature-list" style="margin-top: 24px;">
+        <ul class="feature-list">
           <li class="feature-item">
-            <span class="feature-bullet"></span>
+            <div class="feature-bullet"></div>
             <div>
-              <strong style="color: #ffffff;">Live Completion Tracker:</strong> Sticky progress bar displays answered status in real time to prevent accidental incomplete submissions.
+              <strong style="color: #fff;">Live Completion Tracker:</strong> Sticky progress bar displays answered status in real time to prevent accidental incomplete submissions.
             </div>
           </li>
           <li class="feature-item">
-            <span class="feature-bullet"></span>
+            <div class="feature-bullet"></div>
             <div>
-              <strong style="color: #ffffff;">Written Policy Application:</strong> Tests actual judgment in scenario questions rather than rote multiple-choice memorization.
+              <strong style="color: #fff;">Written Policy Application:</strong> Tests actual judgment in scenario questions rather than rote multiple-choice memorization.
             </div>
           </li>
           <li class="feature-item">
-            <span class="feature-bullet"></span>
+            <div class="feature-bullet"></div>
             <div>
-              <strong style="color: #ffffff;">Responsive & Accessible:</strong> Fully optimized for desktop, tablet, and mobile viewports with keyboard navigation.
+              <strong style="color: #fff;">Responsive & Accessible:</strong> Fully optimized for desktop, tablet, and mobile viewports with keyboard navigation.
             </div>
           </li>
         </ul>
@@ -765,12 +918,12 @@ async function generateDeck() {
 
     <div class="slide-footer">
       <span class="footer-meta">Cognity · Feature Tour 04</span>
-      <span class="footer-page">07 / 12</span>
+      <span class="footer-page">08 / 14</span>
     </div>
   </div>
 </section>
 
-<!-- SLIDE 8: PRODUCT TOUR - REAL-TIME GRADING & AUDIT TRAIL -->
+<!-- SLIDE 9: PRODUCT TOUR 05 - REAL-TIME GRADING -->
 <section class="slide">
   <div class="slide-content">
     <div class="slide-header">
@@ -778,36 +931,34 @@ async function generateDeck() {
         <div class="brand-mark">C</div>
         <span class="brand-text">Cognity</span>
       </div>
-      <span class="badge badge-emerald">Product Tour · Results</span>
+      <span class="badge">Product Tour · Results</span>
     </div>
 
-    <div class="grid-2" style="align-items: flex-start; height: 100%;">
+    <div class="grid-2">
       <div>
-        <div class="slide-title-area">
-          <span class="category-pill">Instant Feedback Loop</span>
-          <h2 class="slide-title" style="font-size: 38px;">Real-Time AI Grading & Model Answers</h2>
-          <p class="slide-subtitle" style="font-size: 16px;">
-            Upon submission, written responses are evaluated in seconds. Employees immediately see where they scored, why, and how to improve.
-          </p>
-        </div>
+        <span class="category-pill">INSTANT FEEDBACK LOOP</span>
+        <h2 class="slide-title">Real-Time AI Grading & Model Answers</h2>
+        <p class="slide-subtitle">
+          Upon submission, written responses are evaluated in seconds. Employees immediately see where they scored, why, and how to improve.
+        </p>
 
-        <ul class="feature-list" style="margin-top: 24px;">
+        <ul class="feature-list">
           <li class="feature-item">
-            <span class="feature-bullet"></span>
+            <div class="feature-bullet"></div>
             <div>
-              <strong style="color: #ffffff;">High-Confidence AI Evaluation:</strong> Every score is anchored against the official rubric with transparent AI feedback and model comparisons.
+              <strong style="color: #fff;">High-Confidence AI Evaluation:</strong> Every score is anchored against the official rubric with transparent AI feedback and model comparisons.
             </div>
           </li>
           <li class="feature-item">
-            <span class="feature-bullet"></span>
+            <div class="feature-bullet"></div>
             <div>
-              <strong style="color: #ffffff;">Instant Pass/Fail Certification:</strong> Employees earn a formal completion timestamp, recorded in compliance databases for audit verification.
+              <strong style="color: #fff;">Instant Pass/Fail Certification:</strong> Employees earn a formal completion timestamp, recorded in compliance databases for audit verification.
             </div>
           </li>
           <li class="feature-item">
-            <span class="feature-bullet"></span>
+            <div class="feature-bullet"></div>
             <div>
-              <strong style="color: #ffffff;">Educational Rationale:</strong> Employees understand the "why" behind security controls, drastically decreasing real breach exposure.
+              <strong style="color: #fff;">Educational Rationale:</strong> Employees understand the "why" behind security controls, drastically decreasing real breach exposure.
             </div>
           </li>
         </ul>
@@ -815,25 +966,27 @@ async function generateDeck() {
 
       <div class="mockup-window">
         <div class="mockup-header">
-          <span class="dot dot-red"></span>
-          <span class="dot dot-yellow"></span>
-          <span class="dot dot-green"></span>
-          <span class="mockup-url">cognity.app/results/91-percent-passed</span>
+          <div class="mockup-dots">
+            <div class="mockup-dot dot-red"></div>
+            <div class="mockup-dot dot-yellow"></div>
+            <div class="mockup-dot dot-green"></div>
+          </div>
+          <span class="mockup-title">cognity.app/results/91-percent-passed</span>
         </div>
         <div class="mockup-body">
-          <img src="${imgResult}" alt="Graded Results and AI Feedback">
+          <img src="${imgResult}" alt="Assessment Results UI">
         </div>
       </div>
     </div>
 
     <div class="slide-footer">
       <span class="footer-meta">Cognity · Feature Tour 05</span>
-      <span class="footer-page">08 / 12</span>
+      <span class="footer-page">09 / 14</span>
     </div>
   </div>
 </section>
 
-<!-- SLIDE 9: QUALITY TESTING & FAILURE ANALYSIS (20 PTS) -->
+<!-- SLIDE 10: ORIGINALITY & COMPETITIVE DIFFERENTIATION (10 PTS) -->
 <section class="slide">
   <div class="slide-content">
     <div class="slide-header">
@@ -841,21 +994,105 @@ async function generateDeck() {
         <div class="brand-mark">C</div>
         <span class="brand-text">Cognity</span>
       </div>
-      <span class="badge badge-emerald">Quality Testing · 20 of 100 Points</span>
+      <span class="badge badge-purple">Judge Scoring: Originality (10 Pts)</span>
     </div>
 
     <div class="slide-title-area">
-      <span class="category-pill">Resilience & Rigor</span>
+      <span class="category-pill">MEANINGFUL DIFFERENTIATION</span>
+      <h2 class="slide-title">Cognity vs Legacy Compliance & Manual Workflows</h2>
+      <p class="slide-subtitle">
+        How Cognity meaningfully breaks away from generic LMS platforms and unscalable manual review processes.
+      </p>
+    </div>
+
+    <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 24px;">
+      <table class="matrix-table">
+        <thead>
+          <tr>
+            <th>Feature / Capability</th>
+            <th style="color: #38bdf8;">Cognity Engine</th>
+            <th>KnowBe4 / Legacy LMS</th>
+            <th>Workday Learning</th>
+            <th>Manual Human Review</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Policy Ingestion</strong></td>
+            <td class="matrix-highlight">Raw 50MB PDF Ingestion</td>
+            <td>Generic Catalogues Only</td>
+            <td>Manual Video / Slideware</td>
+            <td>Manual Reading</td>
+          </tr>
+          <tr>
+            <td><strong>Assessment Authoring Time</strong></td>
+            <td class="matrix-highlight">&lt; 30 Seconds</td>
+            <td>Static (Weeks to update)</td>
+            <td>Manual Form Authoring</td>
+            <td>20+ Hours per Cycle</td>
+          </tr>
+          <tr>
+            <td><strong>Testing Methodology</strong></td>
+            <td class="matrix-highlight">Scenario + Open-Ended Written</td>
+            <td>Rote Multiple-Choice Guessing</td>
+            <td>Slide Completion Clicks</td>
+            <td>Oral / Essay Interviews</td>
+          </tr>
+          <tr>
+            <td><strong>Open-Ended Grading Latency</strong></td>
+            <td class="matrix-highlight">&lt; 3 Seconds (AI Rubric)</td>
+            <td>Not Supported</td>
+            <td>Not Supported</td>
+            <td>15-20 Minutes per Student</td>
+          </tr>
+          <tr>
+            <td><strong>Auditor Proof & Citations</strong></td>
+            <td class="matrix-highlight">100% Policy Citations</td>
+            <td>0% (Attendance Timestamps)</td>
+            <td>0% (Simple Completion)</td>
+            <td>Subjective Notes</td>
+          </tr>
+          <tr>
+            <td><strong>Marginal Cost per Test</strong></td>
+            <td class="matrix-highlight">&lt; $0.01 per Employee</td>
+            <td>$15 - $25 / Seat / Year</td>
+            <td>$20 - $40 / Seat / Year</td>
+            <td>$50+ in Compliance Hours</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="slide-footer">
+      <span class="footer-meta">Cognity · Competitive Advantage</span>
+      <span class="footer-page">10 / 14</span>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 11: QUALITY TESTING & FAILURE ANALYSIS (20 PTS) -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="slide-header">
+      <div class="brand-logo">
+        <div class="brand-mark">C</div>
+        <span class="brand-text">Cognity</span>
+      </div>
+      <span class="badge badge-emerald">Judge Scoring: Quality Testing (20 Pts)</span>
+    </div>
+
+    <div class="slide-title-area">
+      <span class="category-pill">RESILIENCE & RIGOR</span>
       <h2 class="slide-title">Quality Testing & Failure Mode Analysis</h2>
       <p class="slide-subtitle">
         Rigorous automated test suites, honest failure modes discovered during stress testing, and architectural remediations.
       </p>
     </div>
 
-    <div class="grid-3" style="margin-bottom: 28px;">
-      <div class="card" style="padding: 24px;">
-        <span class="badge badge-blue" style="margin-bottom: 12px;">Automated Test Suite</span>
-        <h4 style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px;">Vitest & Playwright</h4>
+    <div class="grid-3" style="margin-bottom: 24px;">
+      <div class="card" style="padding: 22px;">
+        <span class="badge badge-blue" style="margin-bottom: 10px;">Automated Test Suite</span>
+        <h4 style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px;">Vitest & Playwright</h4>
         <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #a1a1aa; line-height: 1.45;">
           <li>· <strong style="color: #f4f4f5;">Auth & JWT:</strong> HS256 cookies, session tamper resistance, and bcrypt fallback normalizers.</li>
           <li>· <strong style="color: #f4f4f5;">Scoring Invariants:</strong> Strict verification that points awarded never exceed maximum bounds.</li>
@@ -863,9 +1100,9 @@ async function generateDeck() {
         </ul>
       </div>
 
-      <div class="card" style="padding: 24px;">
-        <span class="badge" style="margin-bottom: 12px; border-color: rgba(244, 63, 94, 0.3); color: #f43f5e; background-color: rgba(244, 63, 94, 0.08);">Failure Modes Found</span>
-        <h4 style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px;">Honest Edge Cases Discovered</h4>
+      <div class="card" style="padding: 22px;">
+        <span class="badge badge-rose" style="margin-bottom: 10px;">Failure Modes Found</span>
+        <h4 style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px;">Honest Edge Cases Discovered</h4>
         <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #a1a1aa; line-height: 1.45;">
           <li>· <strong style="color: #f4f4f5;">Policy Hallucination:</strong> Early models invented generic 60-day password rules vs 90-day policy text.</li>
           <li>· <strong style="color: #f4f4f5;">PDF Token Exceeded:</strong> 50MB PDFs exceeded model contexts on single-pass ingestion.</li>
@@ -873,9 +1110,9 @@ async function generateDeck() {
         </ul>
       </div>
 
-      <div class="card" style="padding: 24px;">
-        <span class="badge badge-emerald" style="margin-bottom: 12px;">Engineered Fixes</span>
-        <h4 style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px;">Architectural Remediations</h4>
+      <div class="card" style="padding: 22px;">
+        <span class="badge badge-emerald" style="margin-bottom: 10px;">Engineered Fixes</span>
+        <h4 style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px;">Architectural Remediations</h4>
         <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #a1a1aa; line-height: 1.45;">
           <li>· <strong style="color: #f4f4f5;">Grounded Boundary Schemas:</strong> Negative constraints require citations; ungrounded questions fail fast.</li>
           <li>· <strong style="color: #f4f4f5;">Clause Chunking + S3:</strong> Stream large PDFs to Neon S3, extract key security clauses.</li>
@@ -884,11 +1121,11 @@ async function generateDeck() {
       </div>
     </div>
 
-    <div class="card" style="padding: 20px 28px; background-color: rgba(24, 24, 27, 0.6);">
+    <div class="card" style="padding: 18px 24px; background-color: rgba(24, 24, 27, 0.6);">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
-          <span style="font-size: 12px; font-family: 'JetBrains Mono', monospace; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 4px;">Benchmark Comparison</span>
-          <span style="font-size: 14px; color: #f4f4f5;">
+          <span style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 4px;">Benchmark Comparison</span>
+          <span style="font-size: 13px; color: #f4f4f5;">
             <strong>Legacy Compliance Tools:</strong> 20+ hours manual quiz drafting · 0% comprehension proof · Guess-and-check multiple choice.<br>
             <strong>Cognity Ground Truth Engine:</strong> 30s automated rubric synthesis · &lt;3s open-ended AI grading · 100% audit defensibility.
           </span>
@@ -898,12 +1135,12 @@ async function generateDeck() {
 
     <div class="slide-footer">
       <span class="footer-meta">Cognity · Quality & Testing</span>
-      <span class="footer-page">09 / 12</span>
+      <span class="footer-page">11 / 14</span>
     </div>
   </div>
 </section>
 
-<!-- SLIDE 10: FEASIBILITY & UNIT ECONOMICS (15 PTS) -->
+<!-- SLIDE 12: FEASIBILITY & UNIT ECONOMICS (15 PTS) -->
 <section class="slide">
   <div class="slide-content">
     <div class="slide-header">
@@ -911,18 +1148,18 @@ async function generateDeck() {
         <div class="brand-mark">C</div>
         <span class="brand-text">Cognity</span>
       </div>
-      <span class="badge badge-emerald">Feasibility & Economics · 15 of 100 Points</span>
+      <span class="badge badge-emerald">Judge Scoring: Feasibility & Economics (15 Pts)</span>
     </div>
 
     <div class="slide-title-area">
-      <span class="category-pill">Feasibility & Scalability</span>
+      <span class="category-pill">FEASIBILITY & SCALABILITY</span>
       <h2 class="slide-title">Unit Economics, Data Requirements & Roadmap</h2>
       <p class="slide-subtitle">
         Zero proprietary data dependencies, sub-cent marginal running costs, and clear enterprise adoption milestones.
       </p>
     </div>
 
-    <div class="grid-4" style="margin-bottom: 28px;">
+    <div class="grid-4" style="margin-bottom: 24px;">
       <div class="metric-box">
         <div class="metric-value">$0.002</div>
         <div class="metric-label">Assessment Generation Cost</div>
@@ -945,18 +1182,18 @@ async function generateDeck() {
       </div>
     </div>
 
-    <div class="grid-2" style="gap: 28px;">
-      <div class="card" style="padding: 24px;">
-        <span class="badge badge-blue" style="margin-bottom: 12px;">Data & Privacy Architecture</span>
-        <h4 style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px;">Zero Data Leakage</h4>
+    <div class="grid-2" style="gap: 24px;">
+      <div class="card" style="padding: 22px;">
+        <span class="badge badge-blue" style="margin-bottom: 10px;">Data & Privacy Architecture</span>
+        <h4 style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px;">Zero Data Leakage</h4>
         <p style="font-size: 13px; color: #a1a1aa; line-height: 1.5;">
           Operates strictly on standard company policy documents (PDF, Markdown). Zero customer data is used for model fine-tuning or retention. Runs on Neon Serverless Postgres with isolated tenant tables and encrypted Neon S3 object storage.
         </p>
       </div>
 
-      <div class="card" style="padding: 24px;">
-        <span class="badge badge-emerald" style="margin-bottom: 12px;">Execution Roadmap</span>
-        <h4 style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px;">Clear Next Steps</h4>
+      <div class="card" style="padding: 22px;">
+        <span class="badge badge-emerald" style="margin-bottom: 10px;">Execution Roadmap</span>
+        <h4 style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px;">Clear Next Steps</h4>
         <p style="font-size: 13px; color: #a1a1aa; line-height: 1.5;">
           <strong>Phase 1 (Immediate):</strong> SCIM directory sync with Okta, Workday, and BambooHR.<br>
           <strong>Phase 2 (Q1 2027):</strong> Automated delta re-certifications triggered on Git/S3 policy revisions.<br>
@@ -967,12 +1204,12 @@ async function generateDeck() {
 
     <div class="slide-footer">
       <span class="footer-meta">Cognity · Economics & Feasibility</span>
-      <span class="footer-page">10 / 12</span>
+      <span class="footer-page">12 / 14</span>
     </div>
   </div>
 </section>
 
-<!-- SLIDE 11: ARCHITECTURE & TECH STACK -->
+<!-- SLIDE 13: TECHNICAL ARCHITECTURE -->
 <section class="slide">
   <div class="slide-content">
     <div class="slide-header">
@@ -984,51 +1221,51 @@ async function generateDeck() {
     </div>
 
     <div class="slide-title-area">
-      <span class="category-pill">Engineering Foundation</span>
+      <span class="category-pill">ENGINEERING FOUNDATION</span>
       <h2 class="slide-title">Modern, Enterprise-Ready Tech Stack</h2>
       <p class="slide-subtitle">
         Architected with bleeding-edge web standards for reliability, high-concurrency compliance cycles, and enterprise data privacy.
       </p>
     </div>
 
-    <div class="grid-4" style="margin-bottom: 28px;">
-      <div class="card" style="padding: 24px;">
-        <span class="badge badge-blue" style="margin-bottom: 12px;">Frontend</span>
-        <h4 style="font-size: 17px; font-weight: 700; color: #fff;">Next.js 16 + React 19</h4>
-        <p style="font-size: 13px; color: #a1a1aa; margin-top: 6px;">
+    <div class="grid-4" style="margin-bottom: 24px;">
+      <div class="card" style="padding: 22px;">
+        <span class="badge badge-blue" style="margin-bottom: 10px;">Frontend</span>
+        <h4 style="font-size: 16px; font-weight: 700; color: #fff;">Next.js 16 + React 19</h4>
+        <p style="font-size: 12px; color: #a1a1aa; margin-top: 6px; line-height: 1.45;">
           Turbopack-powered SSR & Server Actions. Tailwind CSS with shadcn/ui component architecture.
         </p>
       </div>
 
-      <div class="card" style="padding: 24px;">
-        <span class="badge badge-emerald" style="margin-bottom: 12px;">Database</span>
-        <h4 style="font-size: 17px; font-weight: 700; color: #fff;">Neon Postgres</h4>
-        <p style="font-size: 13px; color: #a1a1aa; margin-top: 6px;">
+      <div class="card" style="padding: 22px;">
+        <span class="badge badge-emerald" style="margin-bottom: 10px;">Database</span>
+        <h4 style="font-size: 16px; font-weight: 700; color: #fff;">Neon Postgres</h4>
+        <p style="font-size: 12px; color: #a1a1aa; margin-top: 6px; line-height: 1.45;">
           Serverless PostgreSQL with instant branching, automated pooling, and Drizzle ORM schema validation.
         </p>
       </div>
 
-      <div class="card" style="padding: 24px;">
-        <span class="badge badge-blue" style="margin-bottom: 12px;">Storage</span>
-        <h4 style="font-size: 17px; font-weight: 700; color: #fff;">Neon S3 Object Storage</h4>
-        <p style="font-size: 13px; color: #a1a1aa; margin-top: 6px;">
+      <div class="card" style="padding: 22px;">
+        <span class="badge badge-blue" style="margin-bottom: 10px;">Storage</span>
+        <h4 style="font-size: 16px; font-weight: 700; color: #fff;">Neon S3 Object Storage</h4>
+        <p style="font-size: 12px; color: #a1a1aa; margin-top: 6px; line-height: 1.45;">
           Branchable S3-compatible document storage supporting enterprise policy uploads up to 50 MB.
         </p>
       </div>
 
-      <div class="card" style="padding: 24px;">
-        <span class="badge" style="margin-bottom: 12px;">AI Engine</span>
-        <h4 style="font-size: 17px; font-weight: 700; color: #fff;">DeepSeek Reasoner</h4>
-        <p style="font-size: 13px; color: #a1a1aa; margin-top: 6px;">
+      <div class="card" style="padding: 22px;">
+        <span class="badge badge-purple" style="margin-bottom: 10px;">AI Engine</span>
+        <h4 style="font-size: 16px; font-weight: 700; color: #fff;">DeepSeek Reasoner</h4>
+        <p style="font-size: 12px; color: #a1a1aa; margin-top: 6px; line-height: 1.45;">
           Advanced legal & policy reasoning engine for schema-constrained generation and rubric grading.
         </p>
       </div>
     </div>
 
-    <div class="card" style="padding: 24px 32px;">
+    <div class="card" style="padding: 20px 28px;">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
-          <h4 style="font-size: 16px; font-weight: 700; color: #fff;">Enterprise Security by Design</h4>
+          <h4 style="font-size: 15px; font-weight: 700; color: #fff;">Enterprise Security by Design</h4>
           <p style="font-size: 13px; color: #a1a1aa; margin-top: 4px;">
             HS256 JWT sessions in HTTP-only cookies · Zero third-party ad telemetry · bcrypt password hashing with resilient normalizers.
           </p>
@@ -1039,55 +1276,55 @@ async function generateDeck() {
 
     <div class="slide-footer">
       <span class="footer-meta">Cognity · Technical Specifications</span>
-      <span class="footer-page">11 / 12</span>
+      <span class="footer-page">13 / 14</span>
     </div>
   </div>
 </section>
 
-<!-- SLIDE 12: TRACTION & CALL TO ACTION -->
+<!-- SLIDE 14: TRACTION & CALL TO ACTION -->
 <section class="slide" style="justify-content: center; align-items: center; text-align: center;">
   <div class="slide-content" style="justify-content: center; align-items: center; width: 100%;">
-    <div style="margin-bottom: 28px;">
-      <span class="badge badge-emerald">Ready for Deployment</span>
+    <div style="margin-bottom: 24px;">
+      <span class="badge badge-emerald">Ready for Deployment · Verified Live</span>
     </div>
 
-    <h2 style="font-size: 64px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff; margin-bottom: 20px;">
+    <h2 style="font-size: 60px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff; margin-bottom: 18px;">
       Reinvent Compliance with Cognity
     </h2>
 
-    <p style="font-size: 22px; color: #a1a1aa; max-width: 840px; line-height: 1.5; margin-bottom: 48px;">
+    <p style="font-size: 21px; color: #a1a1aa; max-width: 860px; line-height: 1.5; margin-bottom: 42px;">
       Ditch manual question drafting and unread policy manuals. Empower your workforce with grounded compliance assessments.
     </p>
 
-    <div class="card" style="display: flex; gap: 48px; padding: 32px 56px; margin-bottom: 48px; background-color: rgba(24, 24, 27, 0.7); border-color: #3b82f6;">
+    <div class="card" style="display: flex; gap: 48px; padding: 28px 52px; margin-bottom: 42px; background-color: rgba(24, 24, 27, 0.7); border-color: #3b82f6;">
       <div>
-        <div style="font-size: 36px; font-weight: 800; color: #ffffff;">Live & Deployed</div>
+        <div style="font-size: 34px; font-weight: 800; color: #ffffff;">Live & Deployed</div>
         <div style="font-size: 13px; color: #a1a1aa; margin-top: 4px; font-family: 'JetBrains Mono', monospace;">cognity-five.vercel.app</div>
       </div>
       <div style="width: 1px; background-color: #27272a;"></div>
       <div>
-        <div style="font-size: 36px; font-weight: 800; color: #10b981;">Zero Setup</div>
-        <div style="font-size: 13px; color: #a1a1aa; margin-top: 4px; font-family: 'JetBrains Mono', monospace;">Instant Demo Accounts</div>
+        <div style="font-size: 34px; font-weight: 800; color: #10b981;">Zero Setup</div>
+        <div style="font-size: 13px; color: #a1a1aa; margin-top: 4px; font-family: 'JetBrains Mono', monospace;">Instant Demo Switcher</div>
       </div>
       <div style="width: 1px; background-color: #27272a;"></div>
       <div>
-        <div style="font-size: 36px; font-weight: 800; color: #3b82f6;">100% Tested</div>
+        <div style="font-size: 34px; font-weight: 800; color: #3b82f6;">100% Tested</div>
         <div style="font-size: 13px; color: #a1a1aa; margin-top: 4px; font-family: 'JetBrains Mono', monospace;">Automated Test Suite</div>
       </div>
     </div>
 
     <div style="display: flex; gap: 16px; align-items: center;">
-      <span class="badge" style="font-size: 14px; padding: 10px 24px;">
+      <span class="badge" style="font-size: 13px; padding: 10px 22px;">
         Demo: manager@cognity.demo / demo1234
       </span>
-      <span class="badge badge-blue" style="font-size: 14px; padding: 10px 24px;">
+      <span class="badge badge-blue" style="font-size: 13px; padding: 10px 22px;">
         Demo Video (1m 56s): cognity-five.vercel.app/cognity-demo-2min.mp4
       </span>
     </div>
 
-    <div class="slide-footer" style="width: 100%; margin-top: 56px;">
+    <div class="slide-footer" style="width: 100%; margin-top: 48px;">
       <span class="footer-meta">Cognity · All Rights Reserved 2026</span>
-      <span class="footer-page">12 / 12</span>
+      <span class="footer-page">14 / 14</span>
     </div>
   </div>
 </section>
