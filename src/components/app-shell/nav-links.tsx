@@ -7,6 +7,7 @@ import {
   FileText,
   GraduationCap,
   LayoutDashboard,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 import type { Role } from "@/db/schema";
@@ -24,6 +25,7 @@ const NAV_ITEMS: Record<Role, NavItem[]> = {
     { href: "/manager", label: "Dashboard", icon: LayoutDashboard, exact: true },
     { href: "/manager/assessments", label: "Assessments", icon: ClipboardList },
     { href: "/manager/documents", label: "Documents", icon: FileText },
+    { href: "/manager/employees", label: "Employees", icon: Users },
   ],
   EMPLOYEE: [
     { href: "/employee", label: "My training", icon: GraduationCap, exact: true },

@@ -7,23 +7,20 @@ import { getDb } from "@/db";
 import { assessments, assignments, users } from "@/db/schema";
 import { requireManager } from "@/lib/session";
 
-async function loadOwnedAssessment(assessmentId: string, managerId: string) {
+async function loadAssessment(assessmentId: string) {
   const parsed = z.uuid().safeParse(assessmentId);
   if (!parsed.success) return null;
 
   const db = getDb();
-  const assessment = await db.query.assessments.findFirst({
+  return db.query.assessments.findFirst({
     where: eq(assessments.id, parsed.data),
   });
-  if (!assessment || assessment.createdById !== managerId) return null;
-  return assessment;
 }
 
 export async function publishAssessmentAction(formData: FormData) {
-  const manager = await requireManager();
-  const assessment = await loadOwnedAssessment(
+  await requireManager();
+  const assessment = await loadAssessment(
     String(formData.get("assessmentId") ?? ""),
-    manager.id,
   );
   if (!assessment) return;
 
@@ -39,10 +36,9 @@ export async function publishAssessmentAction(formData: FormData) {
 }
 
 export async function assignToAllAction(formData: FormData) {
-  const manager = await requireManager();
-  const assessment = await loadOwnedAssessment(
+  await requireManager();
+  const assessment = await loadAssessment(
     String(formData.get("assessmentId") ?? ""),
-    manager.id,
   );
   if (!assessment || assessment.status !== "PUBLISHED") return;
 
@@ -68,5 +64,36 @@ export async function assignToAllAction(formData: FormData) {
 
   revalidatePath(`/manager/assessments/${assessment.id}`);
   revalidatePath("/manager/assessments");
+  revalidatePath("/manager/employees");
+  revalidatePath("/manager");
+}
+
+export async function assignToSingleEmployeeAction(formData: FormData) {
+  await requireManager();
+  const assessmentId = String(formData.get("assessmentId") ?? "");
+  const employeeId = String(formData.get("employeeId") ?? "");
+  const dueDays = Number(formData.get("dueDays") ?? 14);
+
+  const assessment = await loadAssessment(assessmentId);
+  if (!assessment || assessment.status !== "PUBLISHED") return;
+
+  const parsedEmployee = z.uuid().safeParse(employeeId);
+  if (!parsedEmployee.success) return;
+
+  const db = getDb();
+  const dueAt = new Date(Date.now() + dueDays * 24 * 60 * 60 * 1000);
+
+  await db
+    .insert(assignments)
+    .values({
+      assessmentId: assessment.id,
+      employeeId: parsedEmployee.data,
+      dueAt,
+    })
+    .onConflictDoNothing();
+
+  revalidatePath(`/manager/assessments/${assessment.id}`);
+  revalidatePath("/manager/assessments");
+  revalidatePath("/manager/employees");
   revalidatePath("/manager");
 }

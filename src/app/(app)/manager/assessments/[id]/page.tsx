@@ -37,7 +37,11 @@ import {
 import { formatDate, initials, percent } from "@/lib/metrics";
 import { getAssessmentDetail } from "@/lib/queries";
 import { requireManager } from "@/lib/session";
-import { assignToAllAction, publishAssessmentAction } from "../actions";
+import {
+  assignToAllAction,
+  assignToSingleEmployeeAction,
+  publishAssessmentAction,
+} from "../actions";
 import { QuestionCard } from "./question-card";
 import { retryGenerationAction } from "../../documents/actions";
 
@@ -61,7 +65,13 @@ export default async function AssessmentDetailPage({
   const data = await getAssessmentDetail(id);
   if (!data) notFound();
 
-  const { assessment, questions, assignments, employeeCount } = data;
+  const {
+    assessment,
+    questions,
+    assignments,
+    employeeCount,
+    unassignedEmployees,
+  } = data;
   const generationFailed = query.generation === "failed";
   const hasQuestions = questions.length > 0;
   const totalPoints = questions.reduce(
@@ -217,23 +227,95 @@ export default async function AssessmentDetailPage({
             {assignments.length === 0 ? (
               <div className="flex flex-col items-start gap-3 px-6 pb-6">
                 <p className="text-sm text-muted-foreground">
-                  Assign this assessment to every employee. They will see it in
-                  their training list immediately.
+                  Assign this assessment to all employees or select specific team members below.
                 </p>
-                <form action={assignToAllAction}>
-                  <input
-                    type="hidden"
-                    name="assessmentId"
-                    value={assessment.id}
-                  />
-                  <SubmitButton variant="outline" pendingText="Assigning…">
-                    <UserPlus className="size-4" />
-                    Assign to all employees
-                  </SubmitButton>
-                </form>
+                <div className="flex flex-wrap items-center gap-3">
+                  <form action={assignToAllAction}>
+                    <input
+                      type="hidden"
+                      name="assessmentId"
+                      value={assessment.id}
+                    />
+                    <SubmitButton variant="default" pendingText="Assigning…">
+                      <UserPlus className="size-4" />
+                      Assign to all employees
+                    </SubmitButton>
+                  </form>
+
+                  {unassignedEmployees.length > 0 ? (
+                    <form action={assignToSingleEmployeeAction} className="flex items-center gap-2">
+                      <input
+                        type="hidden"
+                        name="assessmentId"
+                        value={assessment.id}
+                      />
+                      <select
+                        name="employeeId"
+                        required
+                        className="h-9 rounded-md border border-input bg-background px-3 text-xs shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                      >
+                        <option value="">Select individual employee…</option>
+                        {unassignedEmployees.map((emp) => (
+                          <option key={emp.id} value={emp.id}>
+                            {emp.name} ({emp.department ?? "General"})
+                          </option>
+                        ))}
+                      </select>
+                      <SubmitButton variant="outline" pendingText="Assigning…">
+                        <Send className="size-3.5" />
+                        Assign
+                      </SubmitButton>
+                    </form>
+                  ) : null}
+                </div>
               </div>
             ) : (
-              <Table>
+              <>
+                {unassignedEmployees.length > 0 ? (
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-b bg-muted/20 px-6 py-2.5">
+                    <span className="text-xs text-muted-foreground">
+                      {unassignedEmployees.length} team member{unassignedEmployees.length === 1 ? "" : "s"} not yet assigned
+                    </span>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <form action={assignToSingleEmployeeAction} className="flex items-center gap-2">
+                        <input
+                          type="hidden"
+                          name="assessmentId"
+                          value={assessment.id}
+                        />
+                        <select
+                          name="employeeId"
+                          required
+                          className="h-8 rounded-md border border-input bg-background px-2.5 text-xs shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                        >
+                          <option value="">Select employee…</option>
+                          {unassignedEmployees.map((emp) => (
+                            <option key={emp.id} value={emp.id}>
+                              {emp.name} ({emp.department ?? "General"})
+                            </option>
+                          ))}
+                        </select>
+                        <SubmitButton size="sm" variant="outline" pendingText="Assigning…">
+                          <Send className="size-3.5" />
+                          Assign
+                        </SubmitButton>
+                      </form>
+
+                      <form action={assignToAllAction}>
+                        <input
+                          type="hidden"
+                          name="assessmentId"
+                          value={assessment.id}
+                        />
+                        <SubmitButton size="sm" variant="secondary" pendingText="Assigning…">
+                          <UserPlus className="size-3.5" />
+                          Assign all remaining
+                        </SubmitButton>
+                      </form>
+                    </div>
+                  </div>
+                ) : null}
+                <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="pl-6">Employee</TableHead>
@@ -296,6 +378,7 @@ export default async function AssessmentDetailPage({
                   ))}
                 </TableBody>
               </Table>
+              </>
             )}
           </CardContent>
         </Card>
