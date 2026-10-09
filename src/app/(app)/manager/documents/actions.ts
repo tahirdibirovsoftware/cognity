@@ -11,6 +11,7 @@ import {
   type GeneratedAssessment,
 } from "@/lib/ai/generate-assessment";
 import {
+  getDocumentFileBuffer,
   isStorageConfigured,
   sanitizeFileName,
   uploadDocumentFile,
@@ -210,15 +211,46 @@ async function runGenerate(
 ): Promise<GenerateResult> {
   const fileEntry = formData.get("file");
   const hasFile = fileEntry instanceof File && fileEntry.size > 0;
+  const presignedKey = String(formData.get("fileKey") ?? "").trim();
+  const presignedName = String(formData.get("fileName") ?? "").trim();
+  const presignedSize = Number(formData.get("fileSize") ?? 0);
+  const presignedMime = String(formData.get("fileMimeType") ?? "").trim();
+  const clientExtractedText = String(formData.get("extractedText") ?? "").trim();
+
   const rawTitle = String(formData.get("title") ?? "");
-  const title = deriveTitle(rawTitle, hasFile ? fileEntry : null);
+  const title = deriveTitle(
+    rawTitle,
+    presignedName ? { name: presignedName } as File : hasFile ? fileEntry : null,
+  );
 
   const intent = String(formData.get("intent") ?? "generate");
   const pasted = String(formData.get("content") ?? "").trim();
 
   let content = pasted;
   let stored: StoredFile | null = null;
-  if (hasFile) {
+
+  if (presignedKey) {
+    stored = {
+      key: presignedKey,
+      name: presignedName || "document.pdf",
+      size: presignedSize,
+      mimeType: presignedMime || "application/pdf",
+    };
+    if (clientExtractedText) {
+      content = clientExtractedText;
+    } else {
+      try {
+        const buffer = await getDocumentFileBuffer(presignedKey);
+        content = presignedName.toLowerCase().endsWith(".pdf")
+          ? await safeExtractPdfText(buffer)
+          : new TextDecoder().decode(buffer);
+        content = content.trim();
+      } catch (err) {
+        console.warn("[storage] could not fetch/extract text for presigned key", err);
+        content = "";
+      }
+    }
+  } else if (hasFile) {
     try {
       const processed = await processDocumentFile(fileEntry);
       content = processed.text.trim();
@@ -301,10 +333,10 @@ export async function generateAssessmentAction(
   try {
     result = await runGenerate(manager, formData);
   } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
     console.error("[generateAssessment] unexpected failure", error);
     return {
-      error:
-        "Something went wrong while processing the document. Please try again or paste the text instead.",
+      error: `Could not process document: ${message}`,
     };
   }
 

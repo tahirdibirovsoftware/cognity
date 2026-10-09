@@ -88,3 +88,36 @@ export async function getDocumentDownloadUrl(
     { expiresIn: DOWNLOAD_URL_TTL_SECONDS },
   );
 }
+
+export async function getDocumentUploadUrl(input: {
+  key: string;
+  contentType: string;
+}): Promise<string> {
+  const client = getClient();
+  if (!client) throw new Error("STORAGE_NOT_CONFIGURED");
+
+  return getSignedUrl(
+    client,
+    new PutObjectCommand({
+      Bucket: BUCKET,
+      Key: input.key,
+      ContentType: input.contentType,
+    }),
+    { expiresIn: 600 },
+  );
+}
+
+export async function getDocumentFileBuffer(key: string): Promise<Uint8Array> {
+  const client = getClient();
+  if (!client) throw new Error("STORAGE_NOT_CONFIGURED");
+
+  const response = await client.send(
+    new GetObjectCommand({
+      Bucket: BUCKET,
+      Key: key,
+    }),
+  );
+  if (!response.Body) throw new Error("EMPTY_BODY");
+  const byteArray = await response.Body.transformToByteArray();
+  return byteArray;
+}

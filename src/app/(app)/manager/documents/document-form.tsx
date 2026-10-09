@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { startTransition, useActionState, useRef, useState } from "react";
 import {
   AlertCircle,
   Check,
@@ -44,6 +44,8 @@ export function DocumentForm({
   const [content, setContent] = useState("");
   const [clientError, setClientError] = useState<string | null>(null);
   const [submitIntent, setSubmitIntent] = useState<"save_only" | "generate">("generate");
+  const [selectedFileObj, setSelectedFileObj] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<{
     name: string;
     size: number;
@@ -57,6 +59,7 @@ export function DocumentForm({
     setTitle("");
     setContent("");
     setSelectedFile(null);
+    setSelectedFileObj(null);
     setClientError(null);
   }
 
@@ -64,6 +67,7 @@ export function DocumentForm({
     const file = event.target.files?.[0];
     if (!file) {
       setSelectedFile(null);
+      setSelectedFileObj(null);
       setClientError(null);
       return;
     }
@@ -72,6 +76,7 @@ export function DocumentForm({
     if (!ALLOWED_EXTENSIONS.some((extension) => name.endsWith(extension))) {
       event.target.value = "";
       setSelectedFile(null);
+      setSelectedFileObj(null);
       setClientError(
         "Unsupported file type. Upload a PDF, TXT, or Markdown file.",
       );
@@ -81,6 +86,7 @@ export function DocumentForm({
     if (file.size > MAX_FILE_BYTES) {
       event.target.value = "";
       setSelectedFile(null);
+      setSelectedFileObj(null);
       setClientError(
         `“${file.name}” is ${formatBytes(file.size)} — the maximum upload size is 50 MB. Compress the file or paste the document text instead.`,
       );
@@ -88,6 +94,7 @@ export function DocumentForm({
     }
 
     setSelectedFile({ name: file.name, size: file.size });
+    setSelectedFileObj(file);
     setClientError(null);
 
     // Auto-populate title if empty
@@ -105,25 +112,85 @@ export function DocumentForm({
   function clearSelectedFile() {
     if (fileInputRef.current) fileInputRef.current.value = "";
     setSelectedFile(null);
+    setSelectedFileObj(null);
     setClientError(null);
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    const file = fileInputRef.current?.files?.[0];
-    if (!file || file.size === 0) return;
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setClientError(null);
 
-    if (file.size > MAX_FILE_BYTES) {
-      event.preventDefault();
+    const file = selectedFileObj ?? fileInputRef.current?.files?.[0];
+    if (file && file.size > MAX_FILE_BYTES) {
       setClientError(
-        `“${file.name}” is ${formatBytes(file.size)} — the maximum upload size is 50 MB. Compress the file or paste the document text instead.`,
+        `“${file.name}” is ${formatBytes(file.size)} — the maximum upload size is 50 MB.`,
       );
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.set("title", title);
+      formData.set("content", content);
+      formData.set("intent", submitIntent);
+
+      if (file && file.size > 0) {
+        let uploadedToS3 = false;
+        try {
+          const res = await fetch("/api/documents/upload-url", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              fileName: file.name,
+              fileSize: file.size,
+              contentType: file.type || "application/octet-stream",
+            }),
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            const putRes = await fetch(data.uploadUrl, {
+              method: "PUT",
+              headers: { "Content-Type": data.contentType },
+              body: file,
+            });
+
+            if (putRes.ok) {
+              formData.set("fileKey", data.key);
+              formData.set("fileName", data.fileName);
+              formData.set("fileSize", String(data.fileSize));
+              formData.set("fileMimeType", data.contentType);
+              uploadedToS3 = true;
+            }
+          }
+        } catch (uploadErr) {
+          console.warn("[upload] direct S3 upload failed, falling back to server action", uploadErr);
+        }
+
+        if (!uploadedToS3) {
+          formData.set("file", file);
+        }
+      }
+
+      startTransition(() => {
+        formAction(formData);
+      });
+    } catch (err) {
+      setClientError(
+        err instanceof Error ? err.message : "Failed to submit document.",
+      );
+    } finally {
+      setIsUploading(false);
     }
   }
 
+  const isBusy = pending || isUploading;
   const error = clientError ?? state.error;
 
   return (
-    <form action={formAction} onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-5">
       {state.success && state.message ? (
         <div className="flex items-start gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5 text-sm text-emerald-700 dark:text-emerald-400">
           <Check className="mt-0.5 size-4 shrink-0" />
@@ -256,15 +323,15 @@ export function DocumentForm({
             value="save_only"
             variant="outline"
             className="flex-1"
-            disabled={pending}
+            disabled={isBusy}
             onClick={() => setSubmitIntent("save_only")}
           >
-            {pending && submitIntent === "save_only" ? (
+            {isBusy && submitIntent === "save_only" ? (
               <Loader2 className="size-4 animate-spin" />
             ) : (
               <Upload className="size-4" />
             )}
-            {pending && submitIntent === "save_only"
+            {isBusy && submitIntent === "save_only"
               ? "Uploading & storing…"
               : "Upload & store document"}
           </Button>
@@ -274,21 +341,21 @@ export function DocumentForm({
             name="intent"
             value="generate"
             className="flex-1"
-            disabled={pending}
+            disabled={isBusy}
             onClick={() => setSubmitIntent("generate")}
           >
-            {pending && submitIntent === "generate" ? (
+            {isBusy && submitIntent === "generate" ? (
               <Loader2 className="size-4 animate-spin" />
             ) : (
               <Sparkles className="size-4" />
             )}
-            {pending && submitIntent === "generate"
+            {isBusy && submitIntent === "generate"
               ? "Generating assessment…"
               : "Generate assessment"}
           </Button>
         </div>
         <p className="text-center text-xs leading-relaxed text-muted-foreground">
-          {pending
+          {isBusy
             ? submitIntent === "save_only"
               ? "Uploading document to object storage and saving to your library…"
               : "Reading document → drafting questions → writing rubrics and rationale (~30–60s)."

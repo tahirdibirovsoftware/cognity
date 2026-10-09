@@ -3,7 +3,9 @@ import "server-only";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { SignJWT, jwtVerify } from "jose";
-import type { Role } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { getDb } from "@/db";
+import { users, type Role } from "@/db/schema";
 
 export const SESSION_COOKIE = "cognity_session";
 
@@ -75,6 +77,31 @@ export async function destroySession() {
 export async function requireUser(): Promise<SessionUser> {
   const user = await getSession();
   if (!user) redirect("/login");
+
+  const db = getDb();
+  const dbUser = await db.query.users.findFirst({
+    where: eq(users.id, user.id),
+  });
+
+  if (!dbUser) {
+    const fallbackUser = await db.query.users.findFirst({
+      where: eq(users.email, user.email),
+    });
+    if (fallbackUser) {
+      const refreshed: SessionUser = {
+        id: fallbackUser.id,
+        name: fallbackUser.name,
+        email: fallbackUser.email,
+        role: fallbackUser.role,
+        department: fallbackUser.department,
+      };
+      await createSession(refreshed);
+      return refreshed;
+    }
+    await destroySession();
+    redirect("/login");
+  }
+
   return user;
 }
 
