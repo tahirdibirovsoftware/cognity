@@ -6,20 +6,39 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getDb } from "@/db";
 import { assessments, documents, questions } from "@/db/schema";
-import { generateAssessment } from "@/lib/ai/generate-assessment";
-import { requireManager } from "@/lib/session";
+import {
+  generateAssessment,
+  type GeneratedAssessment,
+} from "@/lib/ai/generate-assessment";
+import { requireManager, type SessionUser } from "@/lib/session";
 
 export type GenerateState = { error?: string };
 
 const ALLOWED_EXTENSIONS = [".pdf", ".txt", ".md"];
-const MAX_FILE_BYTES = 4 * 1024 * 1024;
+const MAX_FILE_BYTES = 3 * 1024 * 1024;
 const MAX_CONTENT_CHARS = 30_000;
+const EXTRACTION_TIMEOUT_MS = 20_000;
 
 const titleSchema = z
   .string()
   .trim()
   .min(3, "Title must be at least 3 characters.")
   .max(160, "Title is too long.");
+
+async function extractPdfText(buffer: Uint8Array): Promise<string> {
+  const { extractText, getDocumentProxy } = await import("unpdf");
+  const pdf = await getDocumentProxy(buffer);
+  const { text } = await Promise.race([
+    extractText(pdf, { mergePages: true }),
+    new Promise<never>((_, reject) =>
+      setTimeout(
+        () => reject(new Error("EXTRACTION_TIMEOUT")),
+        EXTRACTION_TIMEOUT_MS,
+      ),
+    ),
+  ]);
+  return text;
+}
 
 async function readDocumentFile(file: File): Promise<string> {
   if (file.size > MAX_FILE_BYTES) {
@@ -34,31 +53,67 @@ async function readDocumentFile(file: File): Promise<string> {
   const buffer = new Uint8Array(await file.arrayBuffer());
 
   if (name.endsWith(".pdf")) {
-    const { extractText, getDocumentProxy } = await import("unpdf");
-    const pdf = await getDocumentProxy(buffer);
-    const { text } = await extractText(pdf, { mergePages: true });
-    return text;
+    return extractPdfText(buffer);
   }
 
   return new TextDecoder().decode(buffer);
 }
 
 function messageForFileError(error: unknown): string {
-  if (error instanceof Error && error.message === "FILE_TOO_LARGE") {
-    return "The file is larger than 4 MB. Compress it or paste the relevant policy text instead.";
+  if (error instanceof Error) {
+    if (error.message === "FILE_TOO_LARGE") {
+      return "The file is larger than 3 MB. Compress it or paste the relevant policy text instead.";
+    }
+    if (error.message === "UNSUPPORTED_FILE") {
+      return "Unsupported file type. Upload a PDF, TXT, or Markdown file.";
+    }
+    if (error.message === "EXTRACTION_TIMEOUT") {
+      return "This PDF took too long to read. Compress it or paste the policy text instead.";
+    }
+    if (
+      error.name === "PasswordException" ||
+      /password/i.test(error.message)
+    ) {
+      return "This PDF is password-protected. Remove the password and upload it again, or paste the text instead.";
+    }
   }
-  if (error instanceof Error && error.message === "UNSUPPORTED_FILE") {
-    return "Unsupported file type. Upload a PDF, TXT, or Markdown file.";
-  }
-  return "The document could not be read. Try pasting the text instead.";
+  return "The document could not be read. It may be corrupted or scanned — try pasting the text instead.";
 }
 
-export async function generateAssessmentAction(
-  _prev: GenerateState,
-  formData: FormData,
-): Promise<GenerateState> {
-  const manager = await requireManager();
+async function saveGeneratedQuestions(
+  assessmentId: string,
+  generated: GeneratedAssessment,
+) {
+  const db = getDb();
+  await db.delete(questions).where(eq(questions.assessmentId, assessmentId));
+  await db
+    .update(assessments)
+    .set({ title: generated.title })
+    .where(eq(assessments.id, assessmentId));
+  await db.insert(questions).values(
+    generated.questions.map((question, index) => ({
+      assessmentId,
+      position: index + 1,
+      type: question.type,
+      prompt: question.prompt,
+      options:
+        question.type === "MULTIPLE_CHOICE" ? (question.options ?? null) : null,
+      correctAnswer: question.correctAnswer,
+      rubric: question.rubric,
+      rationale: question.rationale,
+      points: question.points,
+    })),
+  );
+}
 
+type GenerateResult =
+  | { assessmentId: string; failed: boolean }
+  | { error: string };
+
+async function runGenerate(
+  manager: SessionUser,
+  formData: FormData,
+): Promise<GenerateResult> {
   const parsedTitle = titleSchema.safeParse(String(formData.get("title") ?? ""));
   if (!parsedTitle.success) {
     return { error: parsedTitle.error.issues[0]?.message ?? "Invalid title." };
@@ -79,7 +134,7 @@ export async function generateAssessmentAction(
   if (content.length < 400) {
     return {
       error:
-        "Provide a policy document with at least a few paragraphs (400+ characters).",
+        "No usable text was found in this document. If it is a scanned PDF, paste the text instead.",
     };
   }
 
@@ -104,49 +159,55 @@ export async function generateAssessmentAction(
     })
     .returning();
 
-  let failed = false;
   try {
     const generated = await generateAssessment({
       title: parsedTitle.data,
       content: normalizedContent,
     });
+    await saveGeneratedQuestions(assessment.id, generated);
+    return { assessmentId: assessment.id, failed: false };
+  } catch (error) {
+    console.error("[generateAssessment] AI generation failed", error);
+    return { assessmentId: assessment.id, failed: true };
+  }
+}
 
-    await db
-      .update(assessments)
-      .set({ title: generated.title })
-      .where(eq(assessments.id, assessment.id));
+export async function generateAssessmentAction(
+  _prev: GenerateState,
+  formData: FormData,
+): Promise<GenerateState> {
+  const manager = await requireManager();
 
-    await db.insert(questions).values(
-      generated.questions.map((question, index) => ({
-        assessmentId: assessment.id,
-        position: index + 1,
-        type: question.type,
-        prompt: question.prompt,
-        options:
-          question.type === "MULTIPLE_CHOICE" ? (question.options ?? null) : null,
-        correctAnswer: question.correctAnswer,
-        rubric: question.rubric,
-        rationale: question.rationale,
-        points: question.points,
-      })),
-    );
-  } catch {
-    failed = true;
+  let result: GenerateResult;
+  try {
+    result = await runGenerate(manager, formData);
+  } catch (error) {
+    console.error("[generateAssessment] unexpected failure", error);
+    return {
+      error:
+        "Something went wrong while processing the document. Please try again or paste the text instead.",
+    };
+  }
+
+  if ("error" in result) {
+    return { error: result.error };
   }
 
   revalidatePath("/manager/documents");
   revalidatePath("/manager");
   redirect(
-    failed
-      ? `/manager/assessments/${assessment.id}?generation=failed`
-      : `/manager/assessments/${assessment.id}`,
+    result.failed
+      ? `/manager/assessments/${result.assessmentId}?generation=failed`
+      : `/manager/assessments/${result.assessmentId}`,
   );
 }
 
 export async function retryGenerationAction(formData: FormData) {
   const manager = await requireManager();
 
-  const parsedId = z.uuid().safeParse(String(formData.get("assessmentId") ?? ""));
+  const parsedId = z
+    .uuid()
+    .safeParse(String(formData.get("assessmentId") ?? ""));
   if (!parsedId.success) return;
 
   const db = getDb();
@@ -162,29 +223,9 @@ export async function retryGenerationAction(formData: FormData) {
       title: assessment.document.title,
       content: assessment.document.content,
     });
-
-    await db
-      .delete(questions)
-      .where(eq(questions.assessmentId, assessment.id));
-    await db
-      .update(assessments)
-      .set({ title: generated.title })
-      .where(eq(assessments.id, assessment.id));
-    await db.insert(questions).values(
-      generated.questions.map((question, index) => ({
-        assessmentId: assessment.id,
-        position: index + 1,
-        type: question.type,
-        prompt: question.prompt,
-        options:
-          question.type === "MULTIPLE_CHOICE" ? (question.options ?? null) : null,
-        correctAnswer: question.correctAnswer,
-        rubric: question.rubric,
-        rationale: question.rationale,
-        points: question.points,
-      })),
-    );
-  } catch {
+    await saveGeneratedQuestions(assessment.id, generated);
+  } catch (error) {
+    console.error("[retryGeneration] AI generation failed", error);
     failed = true;
   }
 

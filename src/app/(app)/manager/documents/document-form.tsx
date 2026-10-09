@@ -23,7 +23,7 @@ import {
 
 const initialState: GenerateState = {};
 
-const MAX_FILE_BYTES = 4 * 1024 * 1024;
+const MAX_FILE_BYTES = 3 * 1024 * 1024;
 const MAX_TEXT_CHARS = 30_000;
 const ALLOWED_EXTENSIONS = [".pdf", ".txt", ".md"];
 
@@ -75,7 +75,7 @@ export function DocumentForm({
       event.target.value = "";
       setSelectedFile(null);
       setClientError(
-        `“${file.name}” is ${formatBytes(file.size)} — the maximum upload size is 4 MB. Compress the file or paste the policy text instead.`,
+        `“${file.name}” is ${formatBytes(file.size)} — the maximum upload size is 3 MB. Compress the file or paste the policy text instead.`,
       );
       return;
     }
@@ -97,7 +97,7 @@ export function DocumentForm({
     if (file.size > MAX_FILE_BYTES) {
       event.preventDefault();
       setClientError(
-        `“${file.name}” is ${formatBytes(file.size)} — the maximum upload size is 4 MB. Compress the file or paste the policy text instead.`,
+        `“${file.name}” is ${formatBytes(file.size)} — the maximum upload size is 3 MB. Compress the file or paste the policy text instead.`,
       );
     }
   }
@@ -177,7 +177,7 @@ export function DocumentForm({
             <Info className="mt-0.5 size-3.5 shrink-0" />
             <span>
               <span className="font-medium text-foreground">
-                Maximum file size: 4 MB.
+                Maximum file size: 3 MB.
               </span>{" "}
               Accepted formats: PDF, TXT, and Markdown. Larger files are
               rejected before upload — compress them or paste the text instead.
