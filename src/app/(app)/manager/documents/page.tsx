@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { FileText, Sparkles } from "lucide-react";
+import { Download, FileText, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,11 +11,13 @@ import {
 } from "@/components/ui/card";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
+import { SubmitButton } from "@/components/submit-button";
 import { assessmentStatusBadge } from "@/components/status-badge";
-import { formatDate } from "@/lib/metrics";
+import { formatBytes, formatDate } from "@/lib/metrics";
 import { getDocumentsWithAssessments } from "@/lib/queries";
 import { requireManager } from "@/lib/session";
 import { SAMPLE_POLICY, SAMPLE_POLICY_TITLE } from "@/lib/sample-policy";
+import { generateFromDocumentAction } from "./actions";
 import { DocumentForm } from "./document-form";
 
 export const metadata: Metadata = {
@@ -81,23 +84,58 @@ export default async function DocumentsPage() {
                     · {document.content.length.toLocaleString()} chars
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="flex flex-wrap gap-2 pt-0">
-                  {document.assessments.length === 0 ? (
-                    <span className="text-xs text-muted-foreground">
-                      No assessment generated yet
-                    </span>
-                  ) : (
-                    document.assessments.map((assessment) => (
-                      <Link
-                        key={assessment.id}
-                        href={`/manager/assessments/${assessment.id}`}
-                        className="flex items-center gap-2 rounded-lg border bg-background px-2.5 py-1.5 text-xs font-medium transition-colors hover:bg-muted"
+                <CardContent className="space-y-3 pt-0">
+                  <div className="flex flex-wrap gap-2">
+                    {document.assessments.length === 0 ? (
+                      <span className="text-xs text-muted-foreground">
+                        No assessment generated yet
+                      </span>
+                    ) : (
+                      document.assessments.map((assessment) => (
+                        <Link
+                          key={assessment.id}
+                          href={`/manager/assessments/${assessment.id}`}
+                          className="flex items-center gap-2 rounded-lg border bg-background px-2.5 py-1.5 text-xs font-medium transition-colors hover:bg-muted"
+                        >
+                          {assessment.title}
+                          {assessmentStatusBadge(assessment.status)}
+                        </Link>
+                      ))
+                    )}
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2 border-t pt-3">
+                    {document.fileKey ? (
+                      <Button variant="outline" size="sm" asChild>
+                        <a
+                          href={`/api/documents/${document.id}/file`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <Download className="size-3.5" />
+                          Original file
+                          {document.fileSize
+                            ? ` · ${formatBytes(document.fileSize)}`
+                            : ""}
+                        </a>
+                      </Button>
+                    ) : null}
+                    <form action={generateFromDocumentAction}>
+                      <input
+                        type="hidden"
+                        name="documentId"
+                        value={document.id}
+                      />
+                      <SubmitButton
+                        variant="outline"
+                        size="sm"
+                        pendingText="Generating…"
                       >
-                        {assessment.title}
-                        {assessmentStatusBadge(assessment.status)}
-                      </Link>
-                    ))
-                  )}
+                        <Sparkles className="size-3.5" />
+                        New assessment
+                      </SubmitButton>
+                    </form>
+                  </div>
                 </CardContent>
               </Card>
             ))

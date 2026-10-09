@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { formatBytes } from "@/lib/metrics";
 import {
   generateAssessmentAction,
   type GenerateState,
@@ -26,12 +27,6 @@ const initialState: GenerateState = {};
 const MAX_FILE_BYTES = 3 * 1024 * 1024;
 const MAX_TEXT_CHARS = 30_000;
 const ALLOWED_EXTENSIONS = [".pdf", ".txt", ".md"];
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 export function DocumentForm({
   sampleTitle,
@@ -217,8 +212,8 @@ export function DocumentForm({
             </div>
           ) : (
             <p className="text-xs leading-relaxed text-muted-foreground">
-              Text is extracted from the file and stored in your workspace
-              database. The original file is not kept.
+              The original file is stored privately in object storage and can
+              be downloaded again from your documents.
             </p>
           )}
         </TabsContent>

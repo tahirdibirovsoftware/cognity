@@ -5,6 +5,7 @@ import {
   AlertTriangle,
   ArrowLeft,
   CalendarClock,
+  Paperclip,
   Send,
   Sparkles,
   UserPlus,
@@ -160,6 +161,20 @@ export default async function AssessmentDetailPage({
           <>
             <span>·</span>
             <span>Published {formatDate(assessment.publishedAt)}</span>
+          </>
+        ) : null}
+        {assessment.document.fileKey ? (
+          <>
+            <span>·</span>
+            <a
+              href={`/api/documents/${assessment.document.id}/file`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 font-medium text-foreground underline-offset-4 hover:underline"
+            >
+              <Paperclip className="size-3.5" />
+              Original document
+            </a>
           </>
         ) : null}
       </div>

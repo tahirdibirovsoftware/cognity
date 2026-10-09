@@ -119,6 +119,7 @@ src/
 
 ## Notes
 
-- Files are parsed with `unpdf` (PDF) or plain text; extracted text is stored in Postgres. Object storage is intentionally not required.
+- Uploaded originals (PDF/TXT/MD) are stored in the private Neon object storage bucket `uploads`, and the extracted text is stored in Postgres for generation.
+- Downloads go through the authenticated route `/api/documents/[id]/file`, which issues a 5-minute presigned URL. Employees cannot access originals.
 - If the AI grader is unavailable, written answers fall back to keyword-based scoring marked **low confidence** instead of failing the submission.
 - Scoring: objective answers are graded deterministically against the answer key; written answers by AI with partial credit against the rubric.

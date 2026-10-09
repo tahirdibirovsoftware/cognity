@@ -10,6 +10,11 @@ import {
   generateAssessment,
   type GeneratedAssessment,
 } from "@/lib/ai/generate-assessment";
+import {
+  isStorageConfigured,
+  sanitizeFileName,
+  uploadDocumentFile,
+} from "@/lib/storage";
 import { requireManager, type SessionUser } from "@/lib/session";
 
 export type GenerateState = { error?: string };
@@ -40,7 +45,16 @@ async function extractPdfText(buffer: Uint8Array): Promise<string> {
   return text;
 }
 
-async function readDocumentFile(file: File): Promise<string> {
+type StoredFile = {
+  key: string;
+  name: string;
+  size: number;
+  mimeType: string;
+};
+
+async function processDocumentFile(
+  file: File,
+): Promise<{ text: string; stored: StoredFile | null }> {
   if (file.size > MAX_FILE_BYTES) {
     throw new Error("FILE_TOO_LARGE");
   }
@@ -51,12 +65,32 @@ async function readDocumentFile(file: File): Promise<string> {
   }
 
   const buffer = new Uint8Array(await file.arrayBuffer());
+  const text = name.endsWith(".pdf")
+    ? await extractPdfText(buffer.slice())
+    : new TextDecoder().decode(buffer);
 
-  if (name.endsWith(".pdf")) {
-    return extractPdfText(buffer);
+  let stored: StoredFile | null = null;
+  if (isStorageConfigured()) {
+    try {
+      const key = `documents/${crypto.randomUUID()}/${sanitizeFileName(file.name)}`;
+      await uploadDocumentFile({
+        key,
+        body: buffer,
+        contentType: file.type || "application/octet-stream",
+        fileName: file.name,
+      });
+      stored = {
+        key,
+        name: file.name,
+        size: file.size,
+        mimeType: file.type || "application/octet-stream",
+      };
+    } catch (error) {
+      console.error("[storage] document upload failed", error);
+    }
   }
 
-  return new TextDecoder().decode(buffer);
+  return { text, stored };
 }
 
 function messageForFileError(error: unknown): string {
@@ -123,9 +157,12 @@ async function runGenerate(
   const fileEntry = formData.get("file");
 
   let content = pasted;
+  let stored: StoredFile | null = null;
   if (fileEntry instanceof File && fileEntry.size > 0) {
     try {
-      content = (await readDocumentFile(fileEntry)).trim();
+      const processed = await processDocumentFile(fileEntry);
+      content = processed.text.trim();
+      stored = processed.stored;
     } catch (error) {
       return { error: messageForFileError(error) };
     }
@@ -146,6 +183,10 @@ async function runGenerate(
     .values({
       title: parsedTitle.data,
       content: normalizedContent,
+      fileKey: stored?.key ?? null,
+      fileName: stored?.name ?? null,
+      fileSize: stored?.size ?? null,
+      fileMimeType: stored?.mimeType ?? null,
       uploadedById: manager.id,
     })
     .returning();
@@ -231,6 +272,50 @@ export async function retryGenerationAction(formData: FormData) {
 
   revalidatePath(`/manager/assessments/${assessment.id}`);
   revalidatePath("/manager/documents");
+  redirect(
+    failed
+      ? `/manager/assessments/${assessment.id}?generation=failed`
+      : `/manager/assessments/${assessment.id}`,
+  );
+}
+
+export async function generateFromDocumentAction(formData: FormData) {
+  const manager = await requireManager();
+
+  const parsedId = z
+    .uuid()
+    .safeParse(String(formData.get("documentId") ?? ""));
+  if (!parsedId.success) return;
+
+  const db = getDb();
+  const document = await db.query.documents.findFirst({
+    where: eq(documents.id, parsedId.data),
+  });
+  if (!document) return;
+
+  const [assessment] = await db
+    .insert(assessments)
+    .values({
+      documentId: document.id,
+      title: document.title,
+      createdById: manager.id,
+    })
+    .returning();
+
+  let failed = false;
+  try {
+    const generated = await generateAssessment({
+      title: document.title,
+      content: document.content,
+    });
+    await saveGeneratedQuestions(assessment.id, generated);
+  } catch (error) {
+    console.error("[generateFromDocument] AI generation failed", error);
+    failed = true;
+  }
+
+  revalidatePath("/manager/documents");
+  revalidatePath("/manager");
   redirect(
     failed
       ? `/manager/assessments/${assessment.id}?generation=failed`
