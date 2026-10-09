@@ -48,7 +48,7 @@ export default async function LoginPage() {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_0%,rgba(59,130,246,0.22),transparent_45%)]" />
         <div className="pointer-events-none absolute inset-0 [background-image:linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] [background-size:44px_44px]" />
         <div className="relative">
-          <Logo invert />
+          <Logo />
         </div>
 
         <div className="relative max-w-lg space-y-8">
@@ -104,9 +104,7 @@ export default async function LoginPage() {
 
       <main className="flex flex-1 items-center justify-center px-4 py-10 sm:px-8">
         <div className="w-full max-w-sm">
-          <div className="mb-8 lg:hidden">
-            <Logo />
-          </div>
+          <Logo className="mb-10" />
           <div className="mb-6 space-y-1.5">
             <h2 className="text-xl font-semibold tracking-tight">
               Sign in to your workspace
