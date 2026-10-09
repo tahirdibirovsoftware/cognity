@@ -20,17 +20,9 @@ export function Logo({
       >
         <ShieldCheck className="size-4.5" strokeWidth={2.2} />
       </div>
-      <div className="flex flex-col leading-none">
-        <span className="text-sm font-semibold tracking-tight">Cognity</span>
-        <span
-          className={cn(
-            "mt-0.5 text-[10px] font-medium uppercase tracking-[0.16em]",
-            invert ? "text-zinc-400" : "text-muted-foreground",
-          )}
-        >
-          Compliance AI
-        </span>
-      </div>
+      <span className="font-display text-[22px] leading-none tracking-wide">
+        Cognity
+      </span>
     </div>
   );
 }
