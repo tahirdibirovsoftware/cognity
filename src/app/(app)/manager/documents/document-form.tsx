@@ -3,6 +3,7 @@
 import { useActionState, useRef, useState } from "react";
 import {
   AlertCircle,
+  Check,
   FileText,
   Info,
   Loader2,
@@ -24,7 +25,7 @@ import {
 
 const initialState: GenerateState = {};
 
-const MAX_FILE_BYTES = 3 * 1024 * 1024;
+const MAX_FILE_BYTES = 50 * 1024 * 1024; // 50 MB
 const MAX_TEXT_CHARS = 30_000;
 const ALLOWED_EXTENSIONS = [".pdf", ".txt", ".md"];
 
@@ -42,11 +43,22 @@ export function DocumentForm({
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [clientError, setClientError] = useState<string | null>(null);
+  const [submitIntent, setSubmitIntent] = useState<"save_only" | "generate">("generate");
   const [selectedFile, setSelectedFile] = useState<{
     name: string;
     size: number;
   } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [prevMessage, setPrevMessage] = useState<string | undefined>(undefined);
+
+  if (state.success && state.message !== prevMessage) {
+    setPrevMessage(state.message);
+    setTitle("");
+    setContent("");
+    setSelectedFile(null);
+    setClientError(null);
+  }
 
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -70,13 +82,24 @@ export function DocumentForm({
       event.target.value = "";
       setSelectedFile(null);
       setClientError(
-        `“${file.name}” is ${formatBytes(file.size)} — the maximum upload size is 3 MB. Compress the file or paste the policy text instead.`,
+        `“${file.name}” is ${formatBytes(file.size)} — the maximum upload size is 50 MB. Compress the file or paste the document text instead.`,
       );
       return;
     }
 
     setSelectedFile({ name: file.name, size: file.size });
     setClientError(null);
+
+    // Auto-populate title if empty
+    if (!title.trim()) {
+      const derived = file.name
+        .replace(/\.[^/.]+$/, "")
+        .replace(/[-_]+/g, " ")
+        .trim();
+      if (derived) {
+        setTitle(derived);
+      }
+    }
   }
 
   function clearSelectedFile() {
@@ -92,7 +115,7 @@ export function DocumentForm({
     if (file.size > MAX_FILE_BYTES) {
       event.preventDefault();
       setClientError(
-        `“${file.name}” is ${formatBytes(file.size)} — the maximum upload size is 3 MB. Compress the file or paste the policy text instead.`,
+        `“${file.name}” is ${formatBytes(file.size)} — the maximum upload size is 50 MB. Compress the file or paste the document text instead.`,
       );
     }
   }
@@ -101,6 +124,13 @@ export function DocumentForm({
 
   return (
     <form action={formAction} onSubmit={handleSubmit} className="space-y-5">
+      {state.success && state.message ? (
+        <div className="flex items-start gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5 text-sm text-emerald-700 dark:text-emerald-400">
+          <Check className="mt-0.5 size-4 shrink-0" />
+          {state.message}
+        </div>
+      ) : null}
+
       {error ? (
         <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2.5 text-sm text-destructive">
           <AlertCircle className="mt-0.5 size-4 shrink-0" />
@@ -109,7 +139,7 @@ export function DocumentForm({
       ) : null}
 
       <div className="space-y-2">
-        <Label htmlFor="title">Assessment title</Label>
+        <Label htmlFor="title">Document or assessment title</Label>
         <Input
           id="title"
           name="title"
@@ -137,7 +167,7 @@ export function DocumentForm({
 
         <TabsContent value="paste" className="mt-3 space-y-2">
           <div className="flex items-center justify-between">
-            <Label htmlFor="content">Policy text</Label>
+            <Label htmlFor="content">Document text</Label>
             <Button
               type="button"
               variant="ghost"
@@ -157,7 +187,7 @@ export function DocumentForm({
             name="content"
             value={content}
             onChange={(event) => setContent(event.target.value)}
-            placeholder="Paste the full policy document here…"
+            placeholder="Paste the full document text here…"
             className="min-h-52 resize-y font-mono text-xs leading-relaxed"
             maxLength={MAX_TEXT_CHARS}
           />
@@ -172,15 +202,15 @@ export function DocumentForm({
             <Info className="mt-0.5 size-3.5 shrink-0" />
             <span>
               <span className="font-medium text-foreground">
-                Maximum file size: 3 MB.
+                Maximum file size: 50 MB.
               </span>{" "}
-              Accepted formats: PDF, TXT, and Markdown. Larger files are
-              rejected before upload — compress them or paste the text instead.
+              Accepted formats: PDF, TXT, and Markdown. The original file is stored
+              securely in object storage and can be downloaded anytime.
             </span>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="file">Policy file</Label>
+            <Label htmlFor="file">Document file (PDF, TXT, MD)</Label>
             <Input
               id="file"
               name="file"
@@ -212,26 +242,57 @@ export function DocumentForm({
             </div>
           ) : (
             <p className="text-xs leading-relaxed text-muted-foreground">
-              The original file is stored privately in object storage and can
-              be downloaded again from your documents.
+              Uploaded files are stored in object storage and can be downloaded from your documents list.
             </p>
           )}
         </TabsContent>
       </Tabs>
 
       <div className="space-y-3 border-t pt-4">
-        <Button type="submit" className="w-full" disabled={pending}>
-          {pending ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            <Sparkles className="size-4" />
-          )}
-          {pending ? "Generating assessment…" : "Generate assessment"}
-        </Button>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button
+            type="submit"
+            name="intent"
+            value="save_only"
+            variant="outline"
+            className="flex-1"
+            disabled={pending}
+            onClick={() => setSubmitIntent("save_only")}
+          >
+            {pending && submitIntent === "save_only" ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Upload className="size-4" />
+            )}
+            {pending && submitIntent === "save_only"
+              ? "Uploading & storing…"
+              : "Upload & store document"}
+          </Button>
+
+          <Button
+            type="submit"
+            name="intent"
+            value="generate"
+            className="flex-1"
+            disabled={pending}
+            onClick={() => setSubmitIntent("generate")}
+          >
+            {pending && submitIntent === "generate" ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Sparkles className="size-4" />
+            )}
+            {pending && submitIntent === "generate"
+              ? "Generating assessment…"
+              : "Generate assessment"}
+          </Button>
+        </div>
         <p className="text-center text-xs leading-relaxed text-muted-foreground">
           {pending
-            ? "Reading policy → drafting questions → writing rubrics and rationale. This takes about 30–60 seconds."
-            : "DeepSeek drafts 6 grounded questions with rubrics. You review before publishing."}
+            ? submitIntent === "save_only"
+              ? "Uploading document to object storage and saving to your library…"
+              : "Reading document → drafting questions → writing rubrics and rationale (~30–60s)."
+            : "Upload and store a PDF in object storage or generate an AI assessment directly."}
         </p>
       </div>
     </form>

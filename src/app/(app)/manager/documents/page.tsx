@@ -21,10 +21,10 @@ import { generateFromDocumentAction } from "./actions";
 import { DocumentForm } from "./document-form";
 
 export const metadata: Metadata = {
-  title: "Policy documents",
+  title: "Documents",
 };
 
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 export default async function DocumentsPage() {
   await requireManager();
@@ -33,8 +33,8 @@ export default async function DocumentsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Policy documents"
-        description="Upload or paste a policy. Cognity generates the assessment from the document text."
+        title="Documents"
+        description="Upload and store PDF documents in object storage. Cognity generates assessments from document text."
       />
 
       <div className="grid gap-4 lg:grid-cols-5">
@@ -42,11 +42,11 @@ export default async function DocumentsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <Sparkles className="size-4 text-brand" />
-              Create assessment from policy
+              Upload document or create assessment
             </CardTitle>
             <CardDescription>
-              One document becomes one published assessment with question
-              rubrics and audit rationale.
+              Upload a PDF up to 50 MB to securely store in object storage and generate
+              assessments with question rubrics.
             </CardDescription>
           </CardHeader>
           <CardContent>

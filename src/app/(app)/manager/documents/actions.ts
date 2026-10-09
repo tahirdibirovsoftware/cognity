@@ -17,24 +17,64 @@ import {
 } from "@/lib/storage";
 import { requireManager, type SessionUser } from "@/lib/session";
 
-export type GenerateState = { error?: string };
+export type GenerateState = {
+  error?: string;
+  success?: boolean;
+  message?: string;
+};
 
 const ALLOWED_EXTENSIONS = [".pdf", ".txt", ".md"];
-const MAX_FILE_BYTES = 3 * 1024 * 1024;
+const MAX_FILE_BYTES = 50 * 1024 * 1024; // 50 MB
 const MAX_CONTENT_CHARS = 30_000;
-const EXTRACTION_TIMEOUT_MS = 20_000;
+const EXTRACTION_TIMEOUT_MS = 60_000; // 60 seconds
 
-const titleSchema = z
-  .string()
-  .trim()
-  .min(3, "Title must be at least 3 characters.")
-  .max(160, "Title is too long.");
+function deriveTitle(rawTitle: string, file: File | null): string {
+  const trimmed = rawTitle.trim();
+  if (trimmed.length >= 3) return trimmed;
+  if (file?.name) {
+    const cleaned = file.name
+      .replace(/\.[^/.]+$/, "")
+      .replace(/[-_]+/g, " ")
+      .trim();
+    if (cleaned.length >= 3) return cleaned;
+  }
+  return "Untitled Document";
+}
 
 async function extractPdfText(buffer: Uint8Array): Promise<string> {
   const { extractText, getDocumentProxy } = await import("unpdf");
   const pdf = await getDocumentProxy(buffer);
-  const { text } = await Promise.race([
-    extractText(pdf, { mergePages: true }),
+
+  const maxPagesToScan = Math.min(pdf.numPages, 60);
+  let accumulatedText = "";
+
+  for (let i = 1; i <= maxPagesToScan; i++) {
+    try {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      const pageText = content.items
+        .map((item) => ("str" in item ? (item as { str: string }).str : ""))
+        .join(" ");
+      accumulatedText += pageText + "\n\n";
+      if (accumulatedText.length >= MAX_CONTENT_CHARS * 2) {
+        break;
+      }
+    } catch (pageError) {
+      console.warn(`[unpdf] Failed to read page ${i}`, pageError);
+    }
+  }
+
+  if (accumulatedText.trim().length > 0) {
+    return accumulatedText.trim();
+  }
+
+  const res = await extractText(pdf, { mergePages: true });
+  return typeof res.text === "string" ? res.text : "";
+}
+
+async function safeExtractPdfText(buffer: Uint8Array): Promise<string> {
+  return await Promise.race([
+    extractPdfText(buffer),
     new Promise<never>((_, reject) =>
       setTimeout(
         () => reject(new Error("EXTRACTION_TIMEOUT")),
@@ -42,7 +82,6 @@ async function extractPdfText(buffer: Uint8Array): Promise<string> {
       ),
     ),
   ]);
-  return text;
 }
 
 type StoredFile = {
@@ -65,9 +104,15 @@ async function processDocumentFile(
   }
 
   const buffer = new Uint8Array(await file.arrayBuffer());
-  const text = name.endsWith(".pdf")
-    ? await extractPdfText(buffer.slice())
-    : new TextDecoder().decode(buffer);
+
+  const mimeType =
+    file.type && file.type !== "application/octet-stream"
+      ? file.type
+      : name.endsWith(".pdf")
+        ? "application/pdf"
+        : name.endsWith(".md")
+          ? "text/markdown"
+          : "text/plain";
 
   let stored: StoredFile | null = null;
   if (isStorageConfigured()) {
@@ -76,18 +121,29 @@ async function processDocumentFile(
       await uploadDocumentFile({
         key,
         body: buffer,
-        contentType: file.type || "application/octet-stream",
+        contentType: mimeType,
         fileName: file.name,
       });
       stored = {
         key,
         name: file.name,
         size: file.size,
-        mimeType: file.type || "application/octet-stream",
+        mimeType,
       };
     } catch (error) {
       console.error("[storage] document upload failed", error);
+      throw new Error("STORAGE_UPLOAD_FAILED");
     }
+  }
+
+  let text = "";
+  try {
+    text = name.endsWith(".pdf")
+      ? await safeExtractPdfText(buffer.slice())
+      : new TextDecoder().decode(buffer);
+  } catch (error) {
+    console.warn("[document] text extraction warning", error);
+    text = "";
   }
 
   return { text, stored };
@@ -96,13 +152,16 @@ async function processDocumentFile(
 function messageForFileError(error: unknown): string {
   if (error instanceof Error) {
     if (error.message === "FILE_TOO_LARGE") {
-      return "The file is larger than 3 MB. Compress it or paste the relevant policy text instead.";
+      return "The file is larger than 50 MB. Compress it or paste the relevant text instead.";
     }
     if (error.message === "UNSUPPORTED_FILE") {
       return "Unsupported file type. Upload a PDF, TXT, or Markdown file.";
     }
+    if (error.message === "STORAGE_UPLOAD_FAILED") {
+      return "Could not upload the file to object storage. Please verify storage settings.";
+    }
     if (error.message === "EXTRACTION_TIMEOUT") {
-      return "This PDF took too long to read. Compress it or paste the policy text instead.";
+      return "Reading this PDF took longer than 60 seconds. You can still store it or paste the text instead.";
     }
     if (
       error.name === "PasswordException" ||
@@ -141,24 +200,25 @@ async function saveGeneratedQuestions(
 }
 
 type GenerateResult =
-  | { assessmentId: string; failed: boolean }
+  | { success: true; message: string; mode: "saved" }
+  | { assessmentId: string; failed: boolean; mode: "generated" }
   | { error: string };
 
 async function runGenerate(
   manager: SessionUser,
   formData: FormData,
 ): Promise<GenerateResult> {
-  const parsedTitle = titleSchema.safeParse(String(formData.get("title") ?? ""));
-  if (!parsedTitle.success) {
-    return { error: parsedTitle.error.issues[0]?.message ?? "Invalid title." };
-  }
-
-  const pasted = String(formData.get("content") ?? "").trim();
   const fileEntry = formData.get("file");
+  const hasFile = fileEntry instanceof File && fileEntry.size > 0;
+  const rawTitle = String(formData.get("title") ?? "");
+  const title = deriveTitle(rawTitle, hasFile ? fileEntry : null);
+
+  const intent = String(formData.get("intent") ?? "generate");
+  const pasted = String(formData.get("content") ?? "").trim();
 
   let content = pasted;
   let stored: StoredFile | null = null;
-  if (fileEntry instanceof File && fileEntry.size > 0) {
+  if (hasFile) {
     try {
       const processed = await processDocumentFile(fileEntry);
       content = processed.text.trim();
@@ -168,20 +228,23 @@ async function runGenerate(
     }
   }
 
-  if (content.length < 400) {
+  if (!content && !stored) {
     return {
-      error:
-        "No usable text was found in this document. If it is a scanned PDF, paste the text instead.",
+      error: "Please provide document text or select a file to upload.",
     };
   }
 
-  const normalizedContent = content.slice(0, MAX_CONTENT_CHARS);
+  const normalizedContent =
+    content.length > 0
+      ? content.slice(0, MAX_CONTENT_CHARS)
+      : `[Document: ${title} (${stored?.name ?? "Uploaded file"})]`;
+
   const db = getDb();
 
   const [document] = await db
     .insert(documents)
     .values({
-      title: parsedTitle.data,
+      title,
       content: normalizedContent,
       fileKey: stored?.key ?? null,
       fileName: stored?.name ?? null,
@@ -191,25 +254,40 @@ async function runGenerate(
     })
     .returning();
 
+  if (intent === "save_only") {
+    return {
+      success: true,
+      message: `"${document.title}" was saved and stored in object storage.`,
+      mode: "saved",
+    };
+  }
+
+  if (content.length < 50) {
+    return {
+      error:
+        "The document was saved, but not enough text could be extracted to generate questions automatically. Scanned PDFs need selectable text, or you can paste the text manually.",
+    };
+  }
+
   const [assessment] = await db
     .insert(assessments)
     .values({
       documentId: document.id,
-      title: parsedTitle.data,
+      title,
       createdById: manager.id,
     })
     .returning();
 
   try {
     const generated = await generateAssessment({
-      title: parsedTitle.data,
+      title,
       content: normalizedContent,
     });
     await saveGeneratedQuestions(assessment.id, generated);
-    return { assessmentId: assessment.id, failed: false };
+    return { assessmentId: assessment.id, failed: false, mode: "generated" };
   } catch (error) {
     console.error("[generateAssessment] AI generation failed", error);
-    return { assessmentId: assessment.id, failed: true };
+    return { assessmentId: assessment.id, failed: true, mode: "generated" };
   }
 }
 
@@ -236,6 +314,11 @@ export async function generateAssessmentAction(
 
   revalidatePath("/manager/documents");
   revalidatePath("/manager");
+
+  if (result.mode === "saved") {
+    return { success: true, message: result.message };
+  }
+
   redirect(
     result.failed
       ? `/manager/assessments/${result.assessmentId}?generation=failed`

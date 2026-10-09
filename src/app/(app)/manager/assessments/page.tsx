@@ -52,7 +52,7 @@ export default async function AssessmentsPage() {
           description="Generate your first assessment from a policy document to see it here."
           action={
             <Button asChild>
-              <Link href="/manager/documents">Go to policy documents</Link>
+              <Link href="/manager/documents">Go to documents</Link>
             </Button>
           }
         />

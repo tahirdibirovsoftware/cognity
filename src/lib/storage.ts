@@ -51,11 +51,20 @@ export async function uploadDocumentFile(input: {
   const client = getClient();
   if (!client) throw new Error("STORAGE_NOT_CONFIGURED");
 
+  const buffer = Buffer.isBuffer(input.body)
+    ? input.body
+    : Buffer.from(
+        input.body.buffer,
+        input.body.byteOffset,
+        input.body.byteLength,
+      );
+
   await client.send(
     new PutObjectCommand({
       Bucket: BUCKET,
       Key: input.key,
-      Body: input.body,
+      Body: buffer,
+      ContentLength: buffer.length,
       ContentType: input.contentType,
       ContentDisposition: `inline; filename="${sanitizeHeaderValue(input.fileName)}"`,
     }),

@@ -23,7 +23,7 @@ const NAV_ITEMS: Record<Role, NavItem[]> = {
   MANAGER: [
     { href: "/manager", label: "Dashboard", icon: LayoutDashboard, exact: true },
     { href: "/manager/assessments", label: "Assessments", icon: ClipboardList },
-    { href: "/manager/documents", label: "Policy documents", icon: FileText },
+    { href: "/manager/documents", label: "Documents", icon: FileText },
   ],
   EMPLOYEE: [
     { href: "/employee", label: "My training", icon: GraduationCap, exact: true },

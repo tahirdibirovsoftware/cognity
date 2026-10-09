@@ -8,7 +8,7 @@ import type { SessionUser } from "@/lib/session";
 const SECTION_TITLES: Array<[string, string]> = [
   ["/manager/assessments/", "Assessment review"],
   ["/manager/assessments", "Assessments"],
-  ["/manager/documents", "Policy documents"],
+  ["/manager/documents", "Documents"],
   ["/manager", "Compliance overview"],
   ["/employee/take/", "Assessment"],
   ["/results/", "Answer review"],
