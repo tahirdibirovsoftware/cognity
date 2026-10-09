@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "vitest run",
+    "test": "tsx --test src/lib/employee-schema.test.ts",
     "db:push": "dotenv -e .env.local -- drizzle-kit push",
     "db:seed": "dotenv -e .env.local -- tsx src/db/seed.ts"
   },
@@ -50,8 +50,6 @@
     "eslint-config-next": "16.4.0",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",
-    "typescript": "^5",
-    "vite": "^8.3.4",
-    "vitest": "^5.0.3"
+    "typescript": "^5"
   }
 }
