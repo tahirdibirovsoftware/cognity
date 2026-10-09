@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@ai-sdk/deepseek": "^3.0.63",
+    "@neon/config": "^1.8.6",
+    "@neon/env": "^1.5.3",
     "ai": "^7.0.136",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",

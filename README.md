@@ -70,6 +70,16 @@ The login page has one-click demo buttons. The seed also includes 5 more employe
 
 If the live AI call is slow on stage, the seeded assessment and results are the fallback — the full review and reporting flow works without generating anything.
 
+## Neon CLI and object storage
+
+The repo is linked to a Neon project via the Neon CLI (`.neon`, gitignored). The object-storage policy — a private `uploads` bucket for future attachments and certificates — is declared as code in `neon.ts` and applied with:
+
+```bash
+neon deploy
+```
+
+`neon link` pulls `DATABASE_URL`, the unpooled URL, and S3-compatible storage credentials into `.env.local` automatically. The app currently stores only extracted document text in Postgres, so uploads are optional.
+
 ## Deploying to Vercel
 
 1. Push this repository to GitHub.
