@@ -30,14 +30,18 @@ export async function createSession(user: SessionUser) {
     .setExpirationTime("7d")
     .sign(getSecret());
 
-  const store = await cookies();
-  store.set(SESSION_COOKIE, token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7,
-  });
+  try {
+    const store = await cookies();
+    store.set(SESSION_COOKIE, token, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+  } catch {
+    // In Server Components, cookies cannot be mutated during render.
+  }
 }
 
 export async function getSession(): Promise<SessionUser | null> {
@@ -70,8 +74,12 @@ export async function getSession(): Promise<SessionUser | null> {
 }
 
 export async function destroySession() {
-  const store = await cookies();
-  store.delete(SESSION_COOKIE);
+  try {
+    const store = await cookies();
+    store.delete(SESSION_COOKIE);
+  } catch {
+    // In Server Components, cookies cannot be mutated during render.
+  }
 }
 
 export async function requireUser(): Promise<SessionUser> {
@@ -102,7 +110,13 @@ export async function requireUser(): Promise<SessionUser> {
     redirect("/login");
   }
 
-  return user;
+  return {
+    id: dbUser.id,
+    name: dbUser.name,
+    email: dbUser.email,
+    role: dbUser.role,
+    department: dbUser.department,
+  };
 }
 
 export async function requireManager(): Promise<SessionUser> {
