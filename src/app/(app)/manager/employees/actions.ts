@@ -84,7 +84,49 @@ export async function createEmployeeAction(
 
   return {
     success: true,
-    message: `Created account for ${newUser.name} (${newUser.email}). Initial password: "${parsed.data.password}". They can sign in at /login.`,
+    message: `Account created for ${newUser.name} (${newUser.email}). Initial password: ${parsed.data.password}. Sign in at /login with these credentials.`,
+  };
+}
+
+export async function resetEmployeePasswordAction(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  await requireManager();
+
+  const userId = String(formData.get("userId") ?? "").trim();
+  const newPassword =
+    String(formData.get("newPassword") ?? "").trim() || "welcome123";
+
+  if (!userId) {
+    return { error: "Missing employee ID." };
+  }
+
+  if (newPassword.length < 6) {
+    return { error: "Password must be at least 6 characters." };
+  }
+
+  const db = getDb();
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, userId),
+  });
+
+  if (!user) {
+    return { error: "User not found." };
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, 10);
+  await db
+    .update(users)
+    .set({ passwordHash })
+    .where(eq(users.id, userId));
+
+  revalidatePath("/manager/employees");
+  revalidatePath("/manager");
+
+  return {
+    success: true,
+    message: `Password for ${user.name} (${user.email}) reset to: ${newPassword}`,
   };
 }
 

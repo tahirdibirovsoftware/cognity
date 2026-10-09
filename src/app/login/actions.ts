@@ -1,11 +1,11 @@
 "use server";
 
-import bcrypt from "bcryptjs";
-import { eq } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getDb } from "@/db";
 import { users } from "@/db/schema";
+import { normalizeEmail, verifyUserPassword } from "@/lib/auth-helpers";
 import { createSession } from "@/lib/session";
 
 export type LoginState = { error?: string };
@@ -16,7 +16,7 @@ const DEMO_ACCOUNTS: Record<string, { email: string; password: string }> = {
 };
 
 const credentialsSchema = z.object({
-  email: z.email(),
+  email: z.string().email(),
   password: z.string().min(1).max(200),
 });
 
@@ -29,9 +29,7 @@ export async function loginAction(
 
   const parsed = credentialsSchema.safeParse(
     demoAccount ?? {
-      email: String(formData.get("email") ?? "")
-        .trim()
-        .toLowerCase(),
+      email: normalizeEmail(String(formData.get("email") ?? "")),
       password: String(formData.get("password") ?? ""),
     },
   );
@@ -42,10 +40,19 @@ export async function loginAction(
 
   const db = getDb();
   const user = await db.query.users.findFirst({
-    where: eq(users.email, parsed.data.email),
+    where: sql`lower(${users.email}) = ${parsed.data.email}`,
   });
 
-  if (!user || !(await bcrypt.compare(parsed.data.password, user.passwordHash))) {
+  if (!user) {
+    return { error: "Invalid email or password." };
+  }
+
+  const isPasswordValid = await verifyUserPassword(
+    parsed.data.password,
+    user.passwordHash,
+  );
+
+  if (!isPasswordValid) {
     return { error: "Invalid email or password." };
   }
 

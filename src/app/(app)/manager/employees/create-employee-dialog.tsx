@@ -4,6 +4,7 @@ import { useActionState, useEffect, useState } from "react";
 import {
   AlertCircle,
   Check,
+  Copy,
   Key,
   Mail,
   User,
@@ -45,15 +46,25 @@ export function CreateEmployeeDialog({
   const [role, setRole] = useState<"EMPLOYEE" | "MANAGER">("EMPLOYEE");
   const [department, setDepartment] = useState("Engineering");
   const [password, setPassword] = useState("welcome123");
+  const [email, setEmail] = useState("");
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (state.success) {
       const timer = setTimeout(() => {
         setOpen(false);
-      }, 2500);
+      }, 8000);
       return () => clearTimeout(timer);
     }
   }, [state.success]);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(
+      `Cognity Login Credentials\nEmail: ${email}\nPassword: ${password}\nURL: ${typeof window !== "undefined" ? window.location.origin : ""}/login`,
+    );
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -83,9 +94,30 @@ export function CreateEmployeeDialog({
           ) : null}
 
           {state.success && state.message ? (
-            <div className="flex items-start gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-700 dark:text-emerald-400">
-              <Check className="mt-0.5 size-4 shrink-0" />
-              <span>{state.message}</span>
+            <div className="space-y-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-800 dark:text-emerald-300">
+              <div className="flex items-start gap-2">
+                <Check className="mt-0.5 size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                <span>{state.message}</span>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleCopy}
+                className="mt-1 w-full gap-1.5 text-xs"
+              >
+                {copied ? (
+                  <>
+                    <Check className="size-3.5 text-emerald-600" />
+                    Copied credentials
+                  </>
+                ) : (
+                  <>
+                    <Copy className="size-3.5" />
+                    Copy credentials
+                  </>
+                )}
+              </Button>
             </div>
           ) : null}
 
@@ -116,6 +148,8 @@ export function CreateEmployeeDialog({
                 id="emp-email"
                 name="email"
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="e.g. john.doe@company.com"
                 className="pl-9 text-sm"
                 required

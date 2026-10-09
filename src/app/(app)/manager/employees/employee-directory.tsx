@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/table";
 import { initials } from "@/lib/metrics";
 import { AssignTrainingDialog } from "./assign-training-dialog";
+import { ResetPasswordDialog } from "./reset-password-dialog";
 import { deleteEmployeeAction, type ActionState } from "./actions";
 
 export type EmployeeRecord = {
@@ -281,6 +282,12 @@ export function EmployeeDirectory({
                           />
                         ) : null}
 
+                        <ResetPasswordDialog
+                          employeeId={employee.id}
+                          employeeName={employee.name}
+                          employeeEmail={employee.email}
+                        />
+
                         {employee.id !== currentUserId ? (
                           <form
                             action={deleteAction}
@@ -376,13 +383,42 @@ export function EmployeeDirectory({
                         </div>
                       ) : null}
 
-                      <div className="border-t pt-2">
-                        <AssignTrainingDialog
+                      <div className="flex items-center justify-between gap-2 border-t pt-2">
+                        <div className="flex-1">
+                          <AssignTrainingDialog
+                            employeeId={employee.id}
+                            employeeName={employee.name}
+                            assignedAssessmentIds={employee.assignedAssessmentIds}
+                            publishedAssessments={publishedAssessments}
+                          />
+                        </div>
+                        <ResetPasswordDialog
                           employeeId={employee.id}
                           employeeName={employee.name}
-                          assignedAssessmentIds={employee.assignedAssessmentIds}
-                          publishedAssessments={publishedAssessments}
+                          employeeEmail={employee.email}
                         />
+                        {employee.id !== currentUserId ? (
+                          <form
+                            action={deleteAction}
+                            onSubmit={(e) => {
+                              if (!confirm(`Are you sure you want to remove ${employee.name}?`)) {
+                                e.preventDefault();
+                              }
+                            }}
+                          >
+                            <input type="hidden" name="userId" value={employee.id} />
+                            <Button
+                              type="submit"
+                              variant="ghost"
+                              size="sm"
+                              className="size-8 p-0 text-muted-foreground hover:text-destructive"
+                              title={`Remove ${employee.name}`}
+                            >
+                              <Trash2 className="size-3.5" />
+                              <span className="sr-only">Remove</span>
+                            </Button>
+                          </form>
+                        ) : null}
                       </div>
                     </>
                   ) : null}
@@ -405,7 +441,7 @@ export function EmployeeDirectory({
                 Employee Access Protocol
               </p>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                Employees sign in at <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">/login</code> using their registered email and the initial password set at creation (default: <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">welcome123</code>).
+                Employees sign in at <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">/login</code> using their registered work email and password (default: <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">welcome123</code> or <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">demo1234</code>). Click the key icon on any employee row to reset their password anytime.
               </p>
             </div>
           </div>
