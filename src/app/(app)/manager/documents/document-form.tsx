@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import {
   AlertCircle,
   FileText,
@@ -21,6 +21,9 @@ import {
 
 const initialState: GenerateState = {};
 
+const MAX_FILE_BYTES = 4 * 1024 * 1024;
+const ALLOWED_EXTENSIONS = [".pdf", ".txt", ".md"];
+
 export function DocumentForm({
   sampleTitle,
   samplePolicy,
@@ -34,13 +37,42 @@ export function DocumentForm({
   );
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [clientError, setClientError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    const file = fileInputRef.current?.files?.[0];
+    if (!file || file.size === 0) {
+      setClientError(null);
+      return;
+    }
+
+    const name = file.name.toLowerCase();
+    if (!ALLOWED_EXTENSIONS.some((extension) => name.endsWith(extension))) {
+      event.preventDefault();
+      setClientError("Unsupported file type. Upload a PDF, TXT, or Markdown file.");
+      return;
+    }
+
+    if (file.size > MAX_FILE_BYTES) {
+      event.preventDefault();
+      setClientError(
+        "This file is larger than 4 MB. Compress it or paste the policy text instead.",
+      );
+      return;
+    }
+
+    setClientError(null);
+  }
+
+  const error = clientError ?? state.error;
 
   return (
-    <form action={formAction} className="space-y-5">
-      {state.error ? (
+    <form action={formAction} onSubmit={handleSubmit} className="space-y-5">
+      {error ? (
         <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2.5 text-sm text-destructive">
           <AlertCircle className="mt-0.5 size-4 shrink-0" />
-          {state.error}
+          {error}
         </div>
       ) : null}
 
@@ -101,11 +133,13 @@ export function DocumentForm({
             id="file"
             name="file"
             type="file"
+            ref={fileInputRef}
+            onChange={() => setClientError(null)}
             accept=".pdf,.txt,.md,application/pdf,text/plain,text/markdown"
             className="file:mr-3 file:rounded-md file:border-0 file:bg-muted file:px-3 file:py-1 file:text-xs file:font-medium"
           />
           <p className="text-xs leading-relaxed text-muted-foreground">
-            PDF, TXT, or Markdown · up to 8 MB. Text is extracted and stored in
+            PDF, TXT, or Markdown · up to 4 MB. Text is extracted and stored in
             your workspace database.
           </p>
         </TabsContent>

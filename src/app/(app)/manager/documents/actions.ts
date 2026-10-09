@@ -12,7 +12,7 @@ import { requireManager } from "@/lib/session";
 export type GenerateState = { error?: string };
 
 const ALLOWED_EXTENSIONS = [".pdf", ".txt", ".md"];
-const MAX_FILE_BYTES = 8 * 1024 * 1024;
+const MAX_FILE_BYTES = 4 * 1024 * 1024;
 const MAX_CONTENT_CHARS = 30_000;
 
 const titleSchema = z
@@ -45,7 +45,7 @@ async function readDocumentFile(file: File): Promise<string> {
 
 function messageForFileError(error: unknown): string {
   if (error instanceof Error && error.message === "FILE_TOO_LARGE") {
-    return "The file is larger than 8 MB. Split it or paste the relevant section instead.";
+    return "The file is larger than 4 MB. Compress it or paste the relevant policy text instead.";
   }
   if (error instanceof Error && error.message === "UNSUPPORTED_FILE") {
     return "Unsupported file type. Upload a PDF, TXT, or Markdown file.";

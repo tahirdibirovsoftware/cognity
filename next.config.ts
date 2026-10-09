@@ -2,9 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {
-    serverActions: {
-      bodySizeLimit: "8mb",
-    },
+      serverActions: {
+        bodySizeLimit: "4mb",
+      },
   },
   turbopack: {
     root: process.cwd(),
